@@ -30,16 +30,15 @@ class User(Document):
     profile_image = fields.ImageField(thumbnail_size=(150,150,False))
 
 class MongoDB:
-    def __init__(self, dbName=None):
-
-        connect(db=dbName, host="localhost", port=27017)  # 데이터 베이스생성  -> 컬렉션
-        self.conny = User(username='map')  # User 객체 생성
-
+    def __init__(self):
+        # '192.168.0.15'
+        connect(db="Hobserver", host='localhost', port=27017)  # 데이터 베이스생성  -> 컬렉션
+        self.kobot_B = User(username='kobot_B')  # User 객체 생성
 
     # 저장할 이미지를 매개변수로 넣으면 바로 저장
-    def storeImg(self, img=None):
-        self.conny.profile_image.replace(img, filename='map.jpg')
-        self.conny.save()
+    def storeImg(self, img=None, filename=None):
+        self.kobot_B.profile_image.replace(img, filename=filename)
+        self.kobot_B.save()
 
     # 이미지 가져오기
     def retrieveIme(self):
@@ -49,5 +48,5 @@ class MongoDB:
 
 
 if __name__ =='__main__':
-    mongo = MongoDB('Hobserver')
+    mongo = MongoDB()
     mongo.storeImg()

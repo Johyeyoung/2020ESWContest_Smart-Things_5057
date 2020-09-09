@@ -1,5 +1,4 @@
-
-from MakeMap import *
+from MakeMap import * 
 import cv2
 from MongoDB import *
 
@@ -9,7 +8,7 @@ class Find_path:
         self.makeMap = Realize()
         self.target_x, self.target_y = self.makeMap.find_target_location()  # 밀입자의 좌표
         self.target_x, self.target_y = 32, 149  # 밀입자의 좌표
-        self.map, self.map_str = self.makeMap.draw_result_map() # 맵 만들기
+        self.map, self.map_str = self.makeMap.draw_result_map()  # 맵 만들기
 
         # check 맵 초기화
         self.check_map = [[0 for i in range(len(self.map[0]))] for row in range(len(self.map[0]))]
@@ -22,7 +21,7 @@ class Find_path:
         self.arrows = ''
 
         # mongoDB 객체 생성
-        self.mongo = MongoDB("Hobserver2")
+        self.mongo = MongoDB()
 
 
 
@@ -68,20 +67,33 @@ class Find_path:
         cv2.imshow('test', img)
         cv2.waitKey(0)
 
-        # mongoDB로 옮기기 1......이미지
-        path = './container'  # 자른 이미지들 저장 경로 및 저장
-        cv2.imwrite(path + '/map_result.jpg', img)
-        img = open('./container/17.jpg', 'rb')
-        self.mongo.storeImg(img)
+        # mongoDB로 옮기기 1......자른 이미지들 저장 경로 및 저장
+        cv2.imwrite('./container/map_result.jpg', img)
+        img = open('./container/map_result.jpg', 'rb')
+        self.mongo.storeImg(img, 'map.jpg')  # 넘길 이미지와 이름
 
         # mongoDB로 옮기기 2.......좌표
         arrows = self.arrows.split('/')
         print(arrows)
+        result = [[arrow[0], len(arrow)] for arrow in arrows]
+        print(result)
+
+        checked = {'→': -18, "↓": -18, "←": -18, "↑": -18}
+        pos = ''
+        for r in result:
+            if checked[r[0]] < 0:
+                checked[r[0]] += r[1]
+                pos += r[0]
+                pos += str(checked[r[0]])  # 방향
+            else:
+                pos += r[0]
+                pos += str(r[1])
+
         import paho.mqtt.client as mqtt
         # MQTT client 생성, 이름 ""
         mqtt = mqtt.Client("loadFinder")
         mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
-        mqtt.publish("toloc/roci",)
+        mqtt.publish("mqtt/pathList", pos)  # topic 과 넘겨줄 값
 
 if __name__ =='__main__':
     realize = Find_path()
