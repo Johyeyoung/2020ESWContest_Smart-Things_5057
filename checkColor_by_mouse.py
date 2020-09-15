@@ -62,7 +62,7 @@ cv2.setMouseCallback('img_color', mouse_callback)
 
 
 while(True):
-    img_color = cv2.imread('./container/18.jpg')
+    img_color = cv2.imread('./container/66.jpg')
     img_color = cv2.resize(img_color, dsize=(300, 300))
 
     # 원본 영상을 HSV 영상으로 변환한다

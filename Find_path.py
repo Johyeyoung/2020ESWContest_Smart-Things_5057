@@ -7,7 +7,6 @@ class Find_path:
         # 객체 생성
         self.makeMap = Realize()
         self.target_x, self.target_y = self.makeMap.find_target_location()  # 밀입자의 좌표
-        self.target_x, self.target_y = 32, 149  # 밀입자의 좌표
         self.map, self.map_str = self.makeMap.draw_result_map()  # 맵 만들기
 
         # check 맵 초기화
@@ -61,8 +60,7 @@ class Find_path:
             x, y = self.path[p][0], self.path[p][1]
             #self.map_str[y] = self.map_str[y][:x-1] + self.arrows[p] + self.map_str[y][x+1:]
             cv2.line(img, (x, y), (x, y), (255, 0, 255), 2)
-        self.target_x, self.target_y = 32, 149  # 밀입자의 좌표
-        cv2.line(img, (self.target_x, self.target_y), (self.target_x, self.target_y), (255, 0, 255), 5)
+        #cv2.line(img, (self.target_x, self.target_y), (self.target_x, self.target_y), (255, 255, 255), 5)
 
         cv2.imshow('test', img)
         cv2.waitKey(0)

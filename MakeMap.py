@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 class Realize:
     def __init__(self):
-        self.img = cv2.imread('./container/16.jpg')
+        self.img = cv2.imread('./container/66.jpg')
         self.img = cv2.resize(self.img, dsize=(400, 400), interpolation=cv2.INTER_AREA)
 
         # 이미지의 기본 속성 (행, 열, channel 정보)
@@ -17,7 +17,7 @@ class Realize:
         self.drawing_board = self.img.copy()  # 흰색으로만 이미지 그리기
         self.cut_img = self.img.copy()
 
-
+        self.img_result = self.img.copy()
 
     def contour(self):
 
@@ -96,6 +96,20 @@ class Realize:
         # cv2.waitKey(0)
         #
 
+    ########## 밀반입자의 위치를 반환################
+    def find_target_location(self):
+        self.img_result2 = cv2.resize(self.img_result, (150, 150))
+        gray = cv2.cvtColor(self.img_result2, cv2.COLOR_BGR2GRAY)
+        for i in range(gray.shape[0]):
+            for j in range(gray.shape[1]):
+                if gray[i, j] == 1:
+                    x = j
+                    y = i
+        print("target", x, y)
+        return x, y
+
+
+
     def make_contour(self):
         imgray = cv2.cvtColor(self.img_result, cv2.COLOR_BGR2GRAY)
         for i in range(4, imgray.shape[0]):
@@ -111,7 +125,6 @@ class Realize:
         contours, hierarchy = cv2.findContours(self.canny, cv2.RETR_EXTERNAL,
                                                cv2.CHAIN_APPROX_SIMPLE)
         for i in range(0, len(contours)):
-            # 각 등고선마다의 사각형 포인트를 구해, 일정 크기 이상의 사각형만을 반찬으로써 도출
             cnt = contours[i]
             epsilon = 0.005 * cv2.arcLength(cnt, True)
             approx = cv2.approxPolyDP(cnt, epsilon, True)
@@ -129,7 +142,6 @@ class Realize:
         # cv2.imshow('original222', imgray)
         # cv2.imshow('original3', self.img_result)
         # cv2.waitKey(0)
-
 
 
 
@@ -224,7 +236,7 @@ class Realize:
                     x_gap = x_dot[j+1] - x_dot[j]
                     cX, cY = abs(int(x_dot[j] + x_gap / 2)), abs(int(y_dot[i] + y_gap / 2))
                     cv2.line(self.img_result, (cX, cY), (cX, cY), (255, 0, 255), 4)
-                    if 135 <= imm[cY, cX] <= 255:
+                    if 100 <= imm[cY, cX] <= 255:
                         # 보드판은 검정 사각형으로 그림그리기
                         cv2.rectangle(self.img_result, (x_dot[j], y_dot[i]), (x_dot[j+1], y_dot[i+1]), (0, 0, 0), -1)
                         #print("보드판:", imm[cY, cX])
@@ -234,11 +246,7 @@ class Realize:
         cv2.waitKey(0)
 
 
-########## 밀반입자의 위치를 반환################
-    def find_target_location(self):
-        x = 0
-        y = 0
-        return x, y
+
 
 ############## 마지막 맵 ################
     def draw_result_map(self):
@@ -280,8 +288,5 @@ class Realize:
 
 if __name__ =='__main__':
     realize = Realize()
-    #realize.contour()
-    #realize.delete_destroy()
-    #realize.make_contour()
-    #realize.pixel_content()
     realize.draw_result_map()
+    realize.find_target_location()
