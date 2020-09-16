@@ -3,9 +3,9 @@ import cv2
 from MongoDB import *
 
 class Find_path:
-    def __init__(self):
+    def __init__(self, img):
         # 객체 생성
-        self.makeMap = Realize()
+        self.makeMap = Realize(img)
         self.makeMap.contour()
         self.makeMap.delete_destroy()
         self.target_x, self.target_y = self.makeMap.find_target_location()  # 밀입자의 좌표
@@ -15,7 +15,7 @@ class Find_path:
 
         # check 맵 초기화
         self.check_map = [[0 for i in range(len(self.map[0]))] for row in range(len(self.map[0]))]
-        self.arrow = {(0, 1): "→",  (1, 0): "↓", (0, -1): "←", (-1, 0): "↑"}  # (y, x)
+        self.arrow = {(0, 1): "R",  (1, 0): "G", (0, -1): "L", (-1, 0): "B"}  # (y, x)
 
         self.dx = [1, 0, -1, 0]
         self.dy = [0, 1, 0, -1]
@@ -76,7 +76,7 @@ class Find_path:
         result = [[arrow[0], len(arrow)] for arrow in arrows]
         print(result)
 
-        checked = {'→': -18, "↓": -18, "←": -18, "↑": -18}
+        checked = {'R': -18, "G": -18, "L": -18, "B": -18}
         pos = ''
         for r in result:
             if checked[r[0]] < 0:
@@ -94,8 +94,8 @@ class Find_path:
         mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
         mqtt.publish("mqtt/pathList", pos)  # topic 과 넘겨줄 값
 
-        cv2.imshow('test', img)
-        cv2.waitKey(0)
+        # cv2.imshow('test', img)
+        # cv2.waitKey(0)
 
 
 if __name__ =='__main__':
