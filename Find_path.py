@@ -1,6 +1,7 @@
 from MakeMap import * 
 import cv2
 from MongoDB import *
+import json
 
 class Find_path:
     def __init__(self, img):
@@ -66,10 +67,10 @@ class Find_path:
         cv2.line(img, (self.target_x, self.target_y), (self.target_x, self.target_y), (255, 255, 255), 5)
 
 
-        # mongoDB로 옮기기 1......자른 이미지들 저장 경로 및 저장
-        cv2.imwrite('./container/map_result.jpg', img)
-        img = open('./container/map_result.jpg', 'rb')
-        self.mongo.storeImg(img, 'map.jpg')  # 넘길 이미지와 이름
+        # # mongoDB로 옮기기 1......자른 이미지들 저장 경로 및 저장
+        # cv2.imwrite('./container/map_result.jpg', img)
+        # img = open('./container/map_result.jpg', 'rb')
+        # self.mongo.storeImg(img, 'map.jpg')  # 넘길 이미지와 이름
 
         arrows = self.arrows.split('/')
         print(arrows)
@@ -88,6 +89,11 @@ class Find_path:
                 pos += str(r[1])
             pos += '/'
         print(pos)
+
+        pos = {"load": pos}
+        pos = json.dumps(pos)
+        print(type(pos))
+
         import paho.mqtt.client as mqtt
         # MQTT client 생성, 이름 ""
         mqtt = mqtt.Client("loadFinder")
@@ -99,6 +105,7 @@ class Find_path:
 
 
 if __name__ =='__main__':
-    realize = Find_path()
+    img = cv2.imread('./container/66.jpg')
+    realize = Find_path(img)
     realize.bfs()
     realize.real_path()
