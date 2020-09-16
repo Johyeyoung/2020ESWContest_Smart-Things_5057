@@ -95,7 +95,7 @@ class Find_path:
         # MQTT client 생성, 이름 ""
         mqtt = mqtt.Client("loadFinder")
         mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
-        mqtt.publish("pathList", json.dumps({"load": pos}))  # topic 과 넘겨줄 값
+        mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
 
         # cv2.imshow('test', img)
         # cv2.waitKey(0)
