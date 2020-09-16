@@ -90,7 +90,7 @@ class Find_path:
             pos += '/'
         print(pos)
 
-       
+
         import paho.mqtt.client as mqtt
         # MQTT client 생성, 이름 ""
         mqtt = mqtt.Client("loadFinder")
