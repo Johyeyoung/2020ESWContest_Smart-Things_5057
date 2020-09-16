@@ -19,13 +19,13 @@ class Realize:
 
         self.img_result = self.img.copy()
 
+
     def contour(self):
 
         # 1st: 데모판 영역따기 - findcontour 처리해서 가장 큰 사각형 잡기  -> 기울어짐 제거 작업
         imgray = cv2.GaussianBlur(self.img, (5, 5), 0)
         imgray = cv2.cvtColor(imgray, cv2.COLOR_BGR2GRAY)
         self.canny = cv2.Canny(imgray, 100, 200)
-        cv2.imshow('canny_resu2lt', self.canny)
         # 등고선 전처리 ('contours'는 리스트로써 각각의 등고선들(등고선도 리스트로 각각의 점을 담음)을 담고있다)
         contours, hierarchy = cv2.findContours(self.canny, cv2.RETR_TREE,
                                                cv2.CHAIN_APPROX_SIMPLE)
@@ -52,10 +52,7 @@ class Realize:
         imgray = cv2.cvtColor(imgray, cv2.COLOR_BGR2GRAY)
         self.canny = cv2.Canny(imgray, 100, 200)
 
-        # cv2.imshow('original', self.img)
-        # cv2.imshow('canny_result', self.canny)
-        # cv2.imshow('cutting', self.cut_img)
-        # cv2.waitKey(0)
+
 
     ################## 휘어진 사진 보정하기 1 ##########################
     def order_point(self, contour):  # 등고선 라인이 주어지면 -> 꼭짓점을 찾는다
@@ -91,21 +88,36 @@ class Realize:
         dst = np.float32([[0, 0], [maxWidth-1, 0], [maxWidth-1, maxHeight-1], [0, maxHeight-1]])
         M = cv2.getPerspectiveTransform(rect, dst)
         self.img_result = cv2.warpPerspective(self.img, M, (maxWidth, maxHeight))
-        #
-        # cv2.imshow("img_result", self.img_result)
-        # cv2.waitKey(0)
-        #
+
+
 
     ########## 밀반입자의 위치를 반환################
     def find_target_location(self):
         self.img_result2 = cv2.resize(self.img_result, (150, 150))
-        gray = cv2.cvtColor(self.img_result2, cv2.COLOR_BGR2GRAY)
-        for i in range(gray.shape[0]):
-            for j in range(gray.shape[1]):
-                if gray[i, j] == 1:
-                    x = j
-                    y = i
-        print("target", x, y)
+        imgray = cv2.GaussianBlur(self.img_result2, (5, 5), 0)
+        imgray = cv2.cvtColor(imgray, cv2.COLOR_BGR2GRAY)
+        canny = cv2.Canny(imgray, 100, 200)
+
+        target_cndt = []
+        contours, hierarchy = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for cnt in contours:
+            epsilon = 0.02 * cv2.arcLength(cnt, True)
+            approx = cv2.approxPolyDP(cnt, epsilon, True)
+            print(len(approx))
+            if len(approx) > 10:
+                area = cv2.contourArea(cnt)
+                x, y, w, h = cv2.boundingRect(cnt)
+                cx, cy = x + w//2, y + h//2
+                target_cndt.append((area, cx, cy))
+                cv2.drawContours(self.img_result2, [approx], 0, (0, 1, 9), 2)
+
+        target_cndt = sorted(target_cndt, key=lambda x: x[0], reverse=True)
+        print(target_cndt)
+        x, y = target_cndt[0][1], target_cndt[0][2]
+        cv2.line(self.img_result2, (x, y), (x, y), (0, 225, 225), 2)
+        cv2.imshow("img_result", self.img_result2)
+        cv2.waitKey(0)
+        print("target:", y, x)
         return x, y
 
 
@@ -138,10 +150,7 @@ class Realize:
             print(x_list)
 
 
-        # cv2.imshow('test', self.canny)
-        # cv2.imshow('original222', imgray)
-        # cv2.imshow('original3', self.img_result)
-        # cv2.waitKey(0)
+
 
 
 
@@ -185,7 +194,6 @@ class Realize:
         return dot_list
 
     def pixel_content(self):
-
         #################중간 결과 좌표###################################################
         for i in range(self.img_result.shape[0]):  # 행 y
             result = ''
@@ -193,7 +201,6 @@ class Realize:
                 if self.canny[i, j] == 255:
                     self.canny[i, j] = 7
                 result += str(self.canny[i, j])
-            #print(result)
 
         dic_int7 = []    # x 좌표 얻기
         for j in range(self.img_result.shape[1]):  # 열 x
@@ -220,8 +227,6 @@ class Realize:
         y_dot = self.get_dot(row_dic_int7)
         y_dot.append(self.img_result.shape[0])
         print("y_dox:", y_dot)
-
-
         for x in x_dot:
             cv2.line(self.img_result, (x, 0), (x, self.img_result.shape[0]), (0, 225, 225), 2)
         for y in y_dot:
@@ -242,16 +247,11 @@ class Realize:
                         #print("보드판:", imm[cY, cX])
 
 
-        cv2.imshow("result_2", self.img_result)
-        cv2.waitKey(0)
-
-
-
 
 ############## 마지막 맵 ################
     def draw_result_map(self):
-        self.contour()
-        self.delete_destroy()
+        # self.contour()
+        # self.delete_destroy()
         self.make_contour()
         self.pixel_content()
         # 한 픽셀에 해당하는 실제거리 구하기
@@ -259,9 +259,6 @@ class Realize:
         picture_width = self.img_result.shape[0]  # 맵의 한면
         one_pixel = real_width/picture_width  # 하나의 픽셀이 담당하는 실제거리
         print('한픽셀에 해당하는 실제 거리(cm):', one_pixel)
-
-
-
         self.img_result = cv2.resize(self.img_result, (150, 150))
 
         ############## 맵 그리기 -보드판(도로) = 0 / 컨테이너 != 0 ################
@@ -282,11 +279,10 @@ class Realize:
 
         path = './container'  # 자른 이미지들 저장 경로 및 저장
         cv2.imwrite(path + '/map.jpg', self.img_result)
-        cv2.imshow("result_2", self.img_result)
-        cv2.waitKey(0)
+        # cv2.imshow("result_2", self.img_result)
+        # cv2.waitKey(0)
         return line_info, line_info_str
 
 if __name__ =='__main__':
     realize = Realize()
     realize.draw_result_map()
-    realize.find_target_location()

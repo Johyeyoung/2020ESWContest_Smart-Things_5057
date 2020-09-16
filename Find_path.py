@@ -6,7 +6,11 @@ class Find_path:
     def __init__(self):
         # 객체 생성
         self.makeMap = Realize()
+        self.makeMap.contour()
+        self.makeMap.delete_destroy()
         self.target_x, self.target_y = self.makeMap.find_target_location()  # 밀입자의 좌표
+        print("타겟의 위치:", self.target_y, self.target_x)
+
         self.map, self.map_str = self.makeMap.draw_result_map()  # 맵 만들기
 
         # check 맵 초기화
@@ -58,12 +62,9 @@ class Find_path:
         img = cv2.imread("./container/map.jpg")
         for p in range(len(self.path)):
             x, y = self.path[p][0], self.path[p][1]
-            #self.map_str[y] = self.map_str[y][:x-1] + self.arrows[p] + self.map_str[y][x+1:]
             cv2.line(img, (x, y), (x, y), (255, 0, 255), 2)
-        #cv2.line(img, (self.target_x, self.target_y), (self.target_x, self.target_y), (255, 255, 255), 5)
+        cv2.line(img, (self.target_x, self.target_y), (self.target_x, self.target_y), (255, 255, 255), 5)
 
-        cv2.imshow('test', img)
-        cv2.waitKey(0)
 
         # mongoDB로 옮기기 1......자른 이미지들 저장 경로 및 저장
         cv2.imwrite('./container/map_result.jpg', img)
@@ -86,12 +87,16 @@ class Find_path:
             else:
                 pos += r[0]
                 pos += str(r[1])
-
+        print(pos)
         import paho.mqtt.client as mqtt
         # MQTT client 생성, 이름 ""
         mqtt = mqtt.Client("loadFinder")
         mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
         mqtt.publish("mqtt/pathList", pos)  # topic 과 넘겨줄 값
+
+        cv2.imshow('test', img)
+        cv2.waitKey(0)
+
 
 if __name__ =='__main__':
     realize = Find_path()
