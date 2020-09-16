@@ -17,7 +17,7 @@ def recvall(sock, count):
     return buf
 
 #수신에 사용될 내 ip와 내 port번호
-TCP_IP = 'localhost'
+TCP_IP = '192.168.0.15'
 TCP_PORT = 5009
 
 #TCP소켓 열고 수신 대기
