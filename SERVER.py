@@ -4,6 +4,8 @@ import numpy
 from Find_path import *
 from MongoDB import *
 import warnings
+import Find_person
+
 warnings.simplefilter("ignore", DeprecationWarning)
 
 #socket 수신 버퍼를 읽어서 반환하는 함수
@@ -54,3 +56,6 @@ print("image save")
 find_path = Find_path(decimg)
 find_path.bfs()
 find_path.real_path()
+
+# Read Turtlebot wabCam and find person
+Find_person.check_person()
