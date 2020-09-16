@@ -51,6 +51,6 @@ mongo.storeImg(img)
 print("image save")
 
 # 길찾기 시작
-find_path = Find_path()
+find_path = Find_path(decimg)
 find_path.bfs()
 find_path.real_path()

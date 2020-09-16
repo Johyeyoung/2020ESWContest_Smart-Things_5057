@@ -6,12 +6,14 @@ import numpy
 
 #연결할 서버(수신단)의 ip주소와 port번호
 TCP_IP = '192.168.0.15'
-TCP_PORT = 5010
+TCP_PORT = 5009
 
 #송신을 위한 socket 준비
 sock = socket.socket()
 sock.connect((TCP_IP, TCP_PORT))
 print('connecting')
+
+
 #OpenCV를 이용해서 webcam으로 부터 이미지 추출
 # capture = cv2.VideoCapture(0)
 # ret, frame = capture.read()
