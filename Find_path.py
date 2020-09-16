@@ -90,15 +90,12 @@ class Find_path:
             pos += '/'
         print(pos)
 
-        pos = {"load": pos}
-        pos = json.dumps(pos)
-        print(type(pos))
-
+       
         import paho.mqtt.client as mqtt
         # MQTT client 생성, 이름 ""
         mqtt = mqtt.Client("loadFinder")
         mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
-        mqtt.publish("mqtt/pathList", pos)  # topic 과 넘겨줄 값
+        mqtt.publish("pathList", json.dumps({"load": pos}))  # topic 과 넘겨줄 값
 
         # cv2.imshow('test', img)
         # cv2.waitKey(0)
