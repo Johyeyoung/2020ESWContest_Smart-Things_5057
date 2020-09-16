@@ -67,10 +67,10 @@ class Find_path:
         cv2.line(img, (self.target_x, self.target_y), (self.target_x, self.target_y), (255, 255, 255), 5)
 
 
-        # # mongoDB로 옮기기 1......자른 이미지들 저장 경로 및 저장
-        # cv2.imwrite('./container/map_result.jpg', img)
-        # img = open('./container/map_result.jpg', 'rb')
-        # self.mongo.storeImg(img, 'map.jpg')  # 넘길 이미지와 이름
+        # mongoDB로 옮기기 1......자른 이미지들 저장 경로 및 저장
+        cv2.imwrite('./container/map_result.jpg', img)
+        img = open('./container/map_result.jpg', 'rb')
+        self.mongo.storeImg(img, 'map.jpg')  # 넘길 이미지와 이름
 
         arrows = self.arrows.split('/')
         print(arrows)
