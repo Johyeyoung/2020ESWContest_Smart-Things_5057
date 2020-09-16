@@ -71,7 +71,6 @@ class Find_path:
         img = open('./container/map_result.jpg', 'rb')
         self.mongo.storeImg(img, 'map.jpg')  # 넘길 이미지와 이름
 
-        # mongoDB로 옮기기 2.......좌표
         arrows = self.arrows.split('/')
         print(arrows)
         result = [[arrow[0], len(arrow)] for arrow in arrows]
@@ -87,6 +86,7 @@ class Find_path:
             else:
                 pos += r[0]
                 pos += str(r[1])
+            pos += '/'
         print(pos)
         import paho.mqtt.client as mqtt
         # MQTT client 생성, 이름 ""
