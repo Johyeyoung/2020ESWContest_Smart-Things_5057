@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>항만 + 터틀봇 모니터링</title>
+      <link rel = "stylesheet" href="./css/web.css" type="text/css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"> </script>
+    <script type="text/javascript">
+      var socket = null;
+      var timer = null;
+      $(document).ready(function(){
+        socket = io.connect(); // 3000 port 웹 서버와 연결
+        // nodejs 보낸 데이터를 수신하는 부분
+        // www 파일의 results[0]이 data로
+        console.log('check');
+        socket.on("otp_evt",function(data){
+          data = JSON.parse(data);
+          if(data.state ==='1'){
+            $(".otpInfo").html('<span style="color:red">OTP 인증되었습니다</span>');
+          }else{
+            $(".otpInfo").html('<span style="color:red">OTP 인증실패해습니다</span>');
+          }          
+        });
+    
+        if(timer == null){
+          // setInterval: 1초에 한 번씩 timer1 함수를 호출하라
+          timer = window.setInterval("timer1()", 1000); //1000: 1초
+        }
+     
+      });
+      function timer1(){
+        // 이벤트와 데이터를 소켓으로
+        // 그럼 노드제이에스에서 데이터베이스에서 소켓으로 전송.
+        socket.emit("otp_state", JSON.stringify({}));
+        console.log("_----_")
+      }
+      function hexToBase64(str) {
+        return btoa(String.fromCharCode.apply(null, str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/  $/, "").split(" ")));
+      }
+
+    </script>
+
+  </head>
+  <body>
+    <h1>항만 모니터링</h1>
+    <hr>
+    <div id = "msg">
+      <div id = "mqtt_logs">
+        <h3><li>OTP 인증 여부</li></h3>
+        <ul class="otpInfo"></ul>
+        <hr>
+      </div>
+    <div class = "middle">
+       <div class="middle-left">
+         <h3><li>드론으로 부터 받은 이미지</li></h3> <span><br>
+           <img src = "/imgs" width="360" height="360" alt = "waiting" />
+         </span>
+       </div>
+         <div class="middle-right">
+           <h3><li>Hobserver - 터틀봇 웹 캠</li></h3><span><br>
+
+            <img style="-webkit-user-select: none;margin: auto;" src="http://192.168.0.32:8080/stream?topic=/image_view/output"
+            width="480" height="360">
+           </span>
+           </div>
+    </div>
+    <hr>
+
+  </body>
+</html>
