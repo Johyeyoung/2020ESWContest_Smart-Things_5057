@@ -38,7 +38,7 @@ mongoDB.connect(url, { useUnifiedTopology: true }, function(err, db){
   });
 
   bucket.openDownloadStreamByName('origin.jpg').pipe(
-    fs.createWriteStream('./test.jpg')).on('error',
+    fs.createWriteStream('./public/images/detected/detect.jpg')).on('error',
     function(error) {
         console.log('Error:-', error);
     }).on('finish', function() {
