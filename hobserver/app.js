@@ -24,11 +24,12 @@ app.use('/users', usersRouter);
 
 var fs = require('fs');
 app.get('/imgs', function(req,res){
-  fs.readFile('test.jpg', function(error, data){
+  fs.readFile('./public/images/detected/detect.jpg', function(error, data){
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(data);
   });
 });
+app.use('/otp', express.static('otp.js'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
