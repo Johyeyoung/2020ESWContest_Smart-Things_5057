@@ -62,8 +62,8 @@ io.on('connection', function(socket){
   console.log('server~');
   socket.on("otp_evt", function(data){
     console.log('socket connect!');
-    var container_img = otp_db.collection('otp_state');
-    container_img.find({}).sort({_id:-1}).limit(1).toArray(function(err, results){
+    var otp_value = otp_db.collection('otp_state');
+    otp_value.find({}).sort({_id:-1}).limit(1).toArray(function(err, results){
       // 에러가 아니면 results 의 데이터들을 hobserver.html 로 보냄
       // socket을 통해 3000포트로 이벤트("ovt_evt")와 데이터(JSON.stringify(results[0]))를 보낸다.
       // results[0] {"state":"1"} or {"state":"0"}
