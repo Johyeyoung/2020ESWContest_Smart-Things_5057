@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>항만 + 터틀봇 모니터링</title>
+      <link rel = "stylesheet" href="./css/web.css" type="text/css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="/otp"></script>
+  </head>
+  <body>
+    <h1>항만 모니터링</h1>
+    <hr>
+    <div id = "msg">
+      <div id = "mqtt_logs">
+        <h3><li>OTP 인증 여부</li></h3>
+        <ul class="otpInfo"></ul>
+        <hr>
+      </div>
+    <div class = "middle">
+       <div class="middle-left">
+         <h3><li>드론으로 부터 받은 이미지</li></h3> <span><br>
+           <img src = "/imgs" width="360" height="360" alt = "waiting" />
+         </span>
+       </div>
+         <div class="middle-right">
+           <h3><li>Hobserver - 터틀봇 웹 캠</li></h3>
+           <span><br>
+            <img style="-webkit-user-select: none;margin: auto;"src="http://192.168.0.32:8080/stream?topic=/image_view/output"
+             width="480" height="360">
+            </span>
+        </div>
+    </div>
+  </body>
+</html>

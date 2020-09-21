@@ -1,0 +1,148 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('hobserver:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+// mongoDB 연결
+// var mongodb = require('mongodb');
+var mongoDB = require('mongodb').MongoClient;
+var url = 'mongodb://127.0.0.1:27017';
+var fs = require('fs');
+var dbObj = null;
+var otp_db = null;
+mongoDB.connect(url, { useUnifiedTopology: true }, function(err, db){
+  dbObj = db.db('Hobserver');
+  console.log("db connect~");
+
+  var bucket = new mongodb.GridFSBucket(dbObj, {
+    chunkSizeBytes:1024,
+    bucketName:'images'
+  });
+
+  bucket.openDownloadStreamByName('origin.jpg').pipe(
+    fs.createWriteStream('./public/images/detected/detect.jpg')).on('error',
+    function(error) {
+        console.log('Error:-', error);
+    }).on('finish', function() {
+    console.log('done!');
+  
+  });
+  // otp 데이터베이스와 연결 
+  otp_db = db.db('OTP');
+});
+
+// web과 socket 통신
+// 3000번 포트를 소켓으로 만듦. socket은 3000번 포트를 가리킴,
+// io는 3000번 포트가 연결된 소켓
+// 만들어진 소켓 객체가 3000번 포트와 연결될 때 connection이란 이벤트 발생.
+// 이 때 함수 하나가 지정됨. 이 함수 안(괄호)으로 소켓 정보가 들어감.d
+// on은 이벤트("socket_evt_mqtt")를 등록하는 함수.
+// 3000번 포트로 html로 이벤트("otp_evt_")와 data 를 받아올 때
+// on 뒤의 함수를 실행한다
+var io = require('socket.io')(server);
+io.on('connection', function(socket){
+  console.log('server~');
+  socket.on("otp_evt", function(data){
+    console.log('socket connect!');
+    var otp_value = otp_db.collection('otp_state');
+    otp_value.find({}).sort({_id:-1}).limit(1).toArray(function(err, results){
+      // 에러가 아니면 results 의 데이터들을 hobserver.html 로 보냄
+      // socket을 통해 3000포트로 이벤트("ovt_evt")와 데이터(JSON.stringify(results[0]))를 보낸다.
+      // results[0] {"state":"1"} or {"state":"0"}
+      // JSON 으로 emit(보내다)
+
+      if(!err){
+          console.log('emit to client!');
+          socket.emit("otp_evt", JSON.stringify(results[0]));
+      }
+    });
+    
+  });
+
+});
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
