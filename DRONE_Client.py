@@ -6,21 +6,23 @@ import json
 
 
 class DRONE_Client:
-    def __init__(self):
+    def __init__(self, img, lct):
 
 
         # mqtt로 값 보내주기
         import paho.mqtt.client as mqtt
-        spot = 'x20y10'
+        x, y = lct[0], lct[1]	
+	
+        spot = "x{}y{}".format(lct[0], lct[1])
         # MQTT client 생성, 이름 ""
         mqtt = mqtt.Client("loadFinder")
-        mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
+        mqtt.connect('192.168.0.15', 1883)  # 로컬호스트에 있는 MQTT서버에 접속
         mqtt.publish("target_location", json.dumps({"data": spot}))  # topic 과 넘겨줄 값
 
 
         # 연결할 서버(수신단)의 ip주소와 port번호
         TCP_IP = '192.168.0.15'
-        TCP_PORT = 5009
+        TCP_PORT = 5010
 
 
         # 송신을 위한 socket 준비
@@ -33,7 +35,7 @@ class DRONE_Client:
         # capture = cv2.VideoCapture(0)
         # ret, frame = capture.read()
         # 그냥 파일로 디버깅
-        frame = cv2.imread('./container/66.jpg')
+        frame = cv2.imread(img)
 
         #추출한 이미지를 String 형태로 변환(인코딩)시키는 과정
         encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
@@ -45,10 +47,10 @@ class DRONE_Client:
         sock.send(str(len(stringData)).encode().ljust(16))
         sock.send(stringData)
         sock.close()
-
+        print("1")
 
         #다시 이미지로 디코딩해서 화면에 출력. 그리고 종료
-        decimg=cv2.imdecode(data,1)
-        cv2.imshow('CLIENT', decimg)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        #decimg=cv2.imdecode(data,1)
+        #cv2.imshow('CLIENT', decimg)
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
