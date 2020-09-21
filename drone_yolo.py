@@ -4,10 +4,9 @@ import cv2
 import imutils
 from imutils.video import FPS
 from imutils.video import VideoStream
+from DRONE_Client import *
 
 
-
-OUTPUT_FILE='output.avi'
 LABELS_FILE='obj.names'
 CONFIG_FILE='yolov4-tiny-custom.cfg'
 WEIGHTS_FILE='yolov4-tiny-custom_10000.weights'
@@ -43,15 +42,11 @@ while True:
 		(grabbed, image) = vs.read()
 	except:
 		break
-	blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416),
-		swapRB=True, crop=False)
+	blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416), swapRB=True, crop=False)
 	net.setInput(blob)
 	if W is None or H is None:
 		(H, W) = image.shape[:2]
 	layerOutputs = net.forward(ln)
-
-
-
 
 
 
@@ -101,6 +96,7 @@ while True:
 	if len(idxs) > 0:
 		cv2.imwrite("test.jpg",cv2.resize(image,(800, 600)))
 		print("img saved")
+		
 		# loop over the indexes we are keeping
 		for i in idxs.flatten():
 			# extract the bounding box coordinates
@@ -113,8 +109,9 @@ while True:
 			text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
 			cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
 				0.5, color, 2)
-			
-
+		# 서버로 이미지, 좌표 보내기
+		drone_client = DRONE_Client("./test.jpg", (x, y))	
+		
 	# show the output image
 	cv2.imshow("output", cv2.resize(image,(800, 600)))
 
