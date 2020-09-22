@@ -34,8 +34,7 @@ print("_________ SERVER get Data _________")
 length = recvall(conn, 16) #길이 16의 데이터를 먼저 수신하는 것은 여기에 이미지의 길이를 먼저 받아서 이미지를 받을 때 편리하려고 하는 것이다.
 stringData = recvall(conn, int(length))
 data = numpy.fromstring(stringData, dtype='uint8')
-
-s.close()
+s.close()  #................이부분 닫지 말까
 decimg = cv2.imdecode(data, 1)
 
 # 이미지 확인하기
@@ -43,23 +42,25 @@ decimg = cv2.imdecode(data, 1)
 #cv2.waitKey(0)
 #cv2.destroyAllWindows()
 
-# 받은 이미지를 mongoDB에 저장
+# ...... 0. mongoDB에 저장할 객체 생성
 mongo = MongoDB()  # mongoDB 객체 생성
 
-# 드론으로 부터 들어온 원본 이미지 저장
+
+# ...... 1. save origin image from drone
 cv2.imwrite('./container/origin.jpg', decimg)
 img = open('./container/origin.jpg', 'rb')
 mongo.storeImg_map(img, 'map_origin.jpg')
-print("image save")
+print("Drone image save!!")
 
-# 길찾기 시작 및 맵 DB에 저장
+
+# ...... 2. 길찾기 시작 및 맵 DB에 저장
 find_path = Find_path(decimg)
 find_path.bfs()
 map_img = find_path.real_path()
-# mongoDB 에 지도 저장 경로 및 저장
 cv2.imwrite('./container/map_result.jpg', map_img)
 img = open('./container/map_result.jpg', 'rb')
 mongo.storeImg_map(map_img, 'map_result.jpg')  # 넘길 이미지와 이름
+print("map_result image save!!")
 
 
 
