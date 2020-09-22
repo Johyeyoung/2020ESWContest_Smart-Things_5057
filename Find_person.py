@@ -8,68 +8,7 @@ from MongoDB import *
 mongo = MongoDB()
 
 
-def on_connect(client, userdata, flags, rc):
-    print("connected with result code" + str(rc))
-    client.subscribe("mqtt/myiot/#")
-
-def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
-    return msg
-
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-
-client.connect("localhost", 1883, 60)
-client.loop_forever()
-
-
-
-def check_person():
-    print('find_person mode')
-
-    # 사람을 확인했는지 확인하는 변수
-    person_ditection = False
-
-    # 터틀봇 영상 가져오기
-    cap = cv2.VideoCapture('http://192.168.0.32:8080/stream?topic=/usb_cam/image_raw')
-    while True:
-       ret, frame = cap.read()
-       cv2.imshow("origin", frame)
-       if cv2.waitKey(1) & 0xFF == ord('q'):
-           break
-       limit = 0
-       # 사람이 발견되면 otp 인증을 한다.
-       person = isPerson(frame)
-
-       if person_ditection == person:
-            # OTP 인증받기
-            result = 0
-
-
-
-
-
-            while result != 1:
-
-
-                # mongoDB로 저장하기
-                img = open('./container/map_result.jpg', 'rb')
-                mongo.storeImg(img, 'map.jpg')  # 넘길 이미지와 이름
-
-
-                # OPT의 결과가 1이면 성공/ 0이면 실패
-                limit += 1
-                if limit == 3:
-                    result = 2
-                   break
-
-            # mongoDB로 옮기기
-            img = open('./container/map_result.jpg', 'rb')
-            mongo.storeImg(, 'map.jpg')  # 넘길 이미지와 이름
-
-
-
+# 들어온 화면에서 yolo로 사람인지 확인하기
 def isPerson(img):
     min_confidence = 0.5
     net = cv2.dnn.readNet("yolov4-tiny-custom_10000.weights", "yolov4-tiny-custom.cfg")
@@ -90,12 +29,10 @@ def isPerson(img):
     net.setInput(blob)
     outs = net.forward(output_layers)  # outs는 감지 결과이다. 탐지된 개체에 대한 모든 정보와 위치를 제공한다.
 
-
     # Showing informations on the screen
     class_ids = []
     confidences = []
     boxes = []
-
 
     for out in outs:
         for detection in out:
@@ -131,4 +68,80 @@ def isPerson(img):
 
     return True if len(boxes) != 0 else len(boxes) == 0
 
+
+
+class MQTT_Subscriber:
+    def __init__(self, topic):
+        self.limit = 0  # 최대 인증 시도 5회까지 check
+        self.result_msg = None  # otp 인증 결과
+        self.topic = topic
+
+        # mongoDB 객체 생성해서 OTP 결과값 저장
+        self.mongo = MongoDB()
+
+        client = mqtt.Client()
+        client.connect("localhost", 1883, 60)
+        client.on_connect = self.on_connect
+        client.on_message = self.on_message
+        client.loop_start()
+
+
+    # self.topic 구독하기
+    def on_connect(self, client, userdata, flags, rc):
+        print("connected with result code" + str(rc))
+        client.subscribe(self.topic)
+
+    # 메세지 대기 모드
+    def on_message(self, client, userdata, msg):
+        input_data = msg.payload.decode()
+        self.result_msg = "Success" if input_data == "1" else "Fail"
+        if input_data == "0":
+            self.limit += 1
+            if self.limit == 5:
+                self.result_msg = "Real Fail"
+        print(self.result_msg)
+        self.mongo.storeStr_otp(self.result_msg)  # MongoDB에 OTP 결과 저장
+
+
+
+def check_person():
+    print('find_person mode')
+
+    # 사람을 확인했는지 확인하는 변수
+    person_ditection = False
+
+    # 터틀봇 영상 가져오기
+    cap = cv2.VideoCapture('http://192.168.0.32:8080/stream?topic=/usb_cam/image_raw')
+    while True:
+        ret, frame = cap.read()
+        # 디버깅용
+        # frame = cv2.imread("./container/66.jpg")
+        cv2.imshow("origin", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+        # 1..... yolo로 사람이 발견되면 otp 인증을 한다.
+        if person_ditection == isPerson(frame):
+
+            # 2..... OTP 인증 Mode start!!
+            otp_client = MQTT_Subscriber("otp")
+            while True:
+                # 2-0..... OTP(MQTT) 메세지 분석
+                otp_result = otp_client.result_msg
+                if otp_result == "Success":
+                    print("인증 성공!")
+                    break
+
+                if otp_client.limit == 5:
+                    # 2-1.... 인증시도 5회 만료시, 현장 사진 mongoDB 저장
+                    print("관리자 확인 요망!")
+                    cv2.imwrite('./otpChecker/intruder.jpg', frame)
+                    img = open('./otpChecker/intruder.jpg', 'rb')
+                    mongo.storeImg_otp(img, 'intruder.jpg')  # 넘길 이미지와 이름
+                    break
+
+
+
+
+# 사람을 찾는 main 함수
 check_person()

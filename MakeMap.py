@@ -7,7 +7,7 @@ class Realize:
 
 
         self.img = img
-        self.img = cv2.imread('./container/11.jpg')
+       # self.img = cv2.imread('./container/11.jpg')
         self.img = cv2.resize(self.img, dsize=(400, 400), interpolation=cv2.INTER_AREA)
 
         # 이미지의 기본 속성 (행, 열, channel 정보)
@@ -104,9 +104,9 @@ class Realize:
             print(target_cndt)
             x, y = target_cndt[0][1], target_cndt[0][2]
             cv2.line(self.img_result2, (x, y), (x, y), (0, 225, 225), 2)
-            # cv2.imshow("img_result", self.img_result2)
-            # cv2.waitKey(0)
-        else: x, y = 16, 99
+            cv2.imshow("img_result", self.img_result2)
+            cv2.waitKey(0)
+
         print("target:", y, x)
         return x, y
 
