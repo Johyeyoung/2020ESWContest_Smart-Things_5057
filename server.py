@@ -46,16 +46,22 @@ decimg = cv2.imdecode(data, 1)
 # 받은 이미지를 mongoDB에 저장
 mongo = MongoDB()  # mongoDB 객체 생성
 
-# 자른 이미지들 저장 경로 및 저장
+# 드론으로 부터 들어온 원본 이미지 저장
 cv2.imwrite('./container/origin.jpg', decimg)
 img = open('./container/origin.jpg', 'rb')
-mongo.storeImg(img)
+mongo.storeImg_map(img, 'map_origin.jpg')
 print("image save")
 
-# 길찾기 시작
+# 길찾기 시작 및 맵 DB에 저장
 find_path = Find_path(decimg)
 find_path.bfs()
-find_path.real_path()
+map_img = find_path.real_path()
+# mongoDB 에 지도 저장 경로 및 저장
+cv2.imwrite('./container/map_result.jpg', map_img)
+img = open('./container/map_result.jpg', 'rb')
+mongo.storeImg_map(map_img, 'map_result.jpg')  # 넘길 이미지와 이름
+
+
 
 # Read Turtlebot wabCam and find person
 Find_person.check_person()

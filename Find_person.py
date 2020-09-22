@@ -142,6 +142,6 @@ def check_person():
 
 
 
-
-# 사람을 찾는 main 함수
-check_person()
+if __name__ =='__main__':
+    # 사람을 찾는 main 함수
+    check_person()
