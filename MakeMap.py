@@ -1,13 +1,13 @@
-# coding=utf-8
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
 class Realize:
-    def __init__(self, img):
+    def __init__(self, img=None):
 
-        #self.img = cv2.imread('./container/66.jpg')
+
         self.img = img
+        self.img = cv2.imread('./container/11.jpg')
         self.img = cv2.resize(self.img, dsize=(400, 400), interpolation=cv2.INTER_AREA)
 
         # 이미지의 기본 속성 (행, 열, channel 정보)
@@ -16,7 +16,6 @@ class Realize:
 
         self.canny = self.img.copy()
         self.imgray = self.img.copy()
-        self.drawing_board = self.img.copy()  # 흰색으로만 이미지 그리기
         self.cut_img = self.img.copy()
 
         self.img_result = self.img.copy()
@@ -36,18 +35,6 @@ class Realize:
         # 기울어진 최대사각형 "sorted_list[-1]" 을 원본이미지에 그린다
         self.hull = cv2.convexHull(sorted_list[-1])
         cv2.drawContours(self.img, [self.hull], 0, (0, 1, 9), 2)
-
-
-
-        # 기울어지지 않은 최대사각형 - 이미지 자르기
-        self.b_x, self.b_y, self.b_w, self.b_h = cv2.boundingRect(sorted_list[-1])
-        #cv2.rectangle(self.img, (self.b_x, self.b_y), (self.b_x + self.b_w, self.b_h + self.b_y), (225, 0, 225),2)
-        self.cut_img = self.img[self.b_y:self.b_h + self.b_y, self.b_x: self.b_x + self.b_w]
-
-        #  칠판의 사이즈만들어주기 - 전체 색깔 검은색 + 사이즈도 줄여주기
-        self.drawing_board = self.cut_img.copy()
-        cv2.rectangle(self.drawing_board, (0, 0), (self.b_w, self.b_h), (0, 0, 0), -1)  # 검은색으로 채워주기
-
 
         # 사각형의 테두리가 그어진 그림으로 다시 등고선 처리하기
         imgray = cv2.GaussianBlur(self.cut_img, (5, 5), 0)
@@ -112,13 +99,14 @@ class Realize:
                 cx, cy = x + w//2, y + h//2
                 target_cndt.append((area, cx, cy))
                 cv2.drawContours(self.img_result2, [approx], 0, (0, 1, 9), 2)
-
-        target_cndt = sorted(target_cndt, key=lambda x: x[0], reverse=True)
-        print(target_cndt)
-        x, y = target_cndt[0][1], target_cndt[0][2]
-        cv2.line(self.img_result2, (x, y), (x, y), (0, 225, 225), 2)
-        # cv2.imshow("img_result", self.img_result2)
-        # cv2.waitKey(0)
+        if target_cndt:
+            target_cndt = sorted(target_cndt, key=lambda x: x[0], reverse=True)
+            print(target_cndt)
+            x, y = target_cndt[0][1], target_cndt[0][2]
+            cv2.line(self.img_result2, (x, y), (x, y), (0, 225, 225), 2)
+            # cv2.imshow("img_result", self.img_result2)
+            # cv2.waitKey(0)
+        else: x, y = 16, 99
         print("target:", y, x)
         return x, y
 
@@ -250,10 +238,9 @@ class Realize:
 
 
 
-############## 마지막 맵 ################
+############## 최종 결과 맵 ################
     def draw_result_map(self):
-        # self.contour()
-        # self.delete_destroy()
+
         self.make_contour()
         self.pixel_content()
         # 한 픽셀에 해당하는 실제거리 구하기
@@ -279,12 +266,14 @@ class Realize:
             drawing = list(map(int, drawing))
             line_info.append(drawing)
 
-        path = './container'  # 자른 이미지들 저장 경로 및 저장
-        cv2.imwrite(path + '/map.jpg', self.img_result)
-        # cv2.imshow("result_2", self.img_result)
-        # cv2.waitKey(0)
+        # 자른 이미지들 저장 경로 및 저장
+        cv2.imwrite('./container/map.jpg', self.img_result)
+        cv2.imshow("result_2", self.img_result)
+        cv2.waitKey(0)
         return line_info, line_info_str
 
 if __name__ =='__main__':
     realize = Realize()
+    realize.contour()
+    realize.delete_destroy()
     realize.draw_result_map()

@@ -5,14 +5,16 @@ import json
 
 class Find_path:
     def __init__(self, img):
-        # 객체 생성
+        # 1... map 생성자 객체 생성
         self.makeMap = Realize(img)
+        # 2... map의 왜곡없애기
         self.makeMap.contour()
         self.makeMap.delete_destroy()
+        # 3... 맵 만들기
+        self.map, self.map_str = self.makeMap.draw_result_map()
+        # 4... 침입자의 위치 알아내기
         self.target_x, self.target_y = self.makeMap.find_target_location()  # 밀입자의 좌표
-        print("타겟의 위치:", self.target_y, self.target_x)
 
-        self.map, self.map_str = self.makeMap.draw_result_map()  # 맵 만들기
 
         # check 맵 초기화
         self.check_map = [[0 for i in range(len(self.map[0]))] for row in range(len(self.map[0]))]
@@ -60,6 +62,8 @@ class Find_path:
                             queue.append((nx, ny, path+[(nx,ny)], direction + [self.arrow[(dy[i], dx[i])]]))
 
     def real_path(self):
+
+        # 1.... 구해진 맵위에 turtlebot이 움직일 경로 그려주기
         img = cv2.imread("./container/map.jpg")
         for p in range(len(self.path)):
             x, y = self.path[p][0], self.path[p][1]
@@ -67,7 +71,7 @@ class Find_path:
         cv2.line(img, (self.target_x, self.target_y), (self.target_x, self.target_y), (255, 255, 255), 5)
 
 
-        # mongoDB로 옮기기 1......자른 이미지들 저장 경로 및 저장
+        # 2.... mongoDB 에 지도       저장 경로 및 저장
         cv2.imwrite('./container/map_result.jpg', img)
         img = open('./container/map_result.jpg', 'rb')
         self.mongo.storeImg(img, 'map.jpg')  # 넘길 이미지와 이름
@@ -92,17 +96,15 @@ class Find_path:
 
 
         import paho.mqtt.client as mqtt
-        # MQTT client 생성, 이름 ""
-        mqtt = mqtt.Client("loadFinder")
+        mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
         mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
         mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
-
-        # cv2.imshow('test', img)
-        # cv2.waitKey(0)
+        cv2.imshow('test', img)
+        cv2.waitKey(0)
 
 
 if __name__ =='__main__':
-    img = cv2.imread('./container/66.jpg')
+    img = cv2.imread('./container/11.jpg')
     realize = Find_path(img)
     realize.bfs()
     realize.real_path()
