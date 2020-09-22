@@ -1,0 +1,6 @@
+<launch>
+
+  <node name="mqtt_bridge" pkg="mqtt_bridge" type="mqtt_bridge_node.py" output="screen">
+    <rosparam file="/home/kobot/catkin_ws/src/kobot9_turtlebot3/config/mqtt_params.yaml" command="load" />
+  </node>
+</launch>
