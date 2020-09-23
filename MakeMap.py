@@ -7,7 +7,7 @@ class Realize:
 
 
         self.img = img
-        self.img = cv2.imread('./container/origin.jpg')
+        # self.img = cv2.imread('./container/origin.jpg')
         self.img = cv2.resize(self.img, dsize=(400, 400), interpolation=cv2.INTER_AREA)
 
         # 이미지의 기본 속성 (행, 열, channel 정보)
