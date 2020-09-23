@@ -4,25 +4,28 @@ import json
 from mongoengine import connect, Document, fields
 import paho.mqtt.client as mqtt
 from MongoDB import *
-
 mongo = MongoDB()
+
+LABELS_FILE='obj.names'
+CONFIG_FILE='yolov4-tiny-custom.cfg'
+WEIGHTS_FILE='yolov4-tiny-custom_10000.weights'
+min_confidence = 0.5
+H, W=None, None
+
+net = cv2.dnn.readNetFromDarknet(CONFIG_FILE, WEIGHTS_FILE)
+layer_names = net.getLayerNames()
+output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+LABELS = open(LABELS_FILE).read().strip().split("\n")
+np.random.seed(4)
+COLORS = np.random.randint(0, 255, size=(len(LABELS), 3), dtype="uint8")
+
 
 
 # 들어온 화면에서 yolo로 사람인지 확인하기
 def isPerson(img):
-    min_confidence = 0.5
-    net = cv2.dnn.readNet("yolov4-tiny-custom_10000.weights", "yolov4-tiny-custom.cfg")
-    classes = []
-    with open("./obj.names", "r") as f:
-        classes = [line.strip() for line in f.readlines()]
-
-    layer_names = net.getLayerNames()
-    output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-    colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
     # Loading image
     height, width, channels = img.shape
-    cv2.imshow("Original Image", img)
 
     # Detecting objects
     blob = cv2.dnn.blobFromImage(img, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
@@ -54,18 +57,29 @@ def isPerson(img):
                 confidences.append(float(confidence))
                 class_ids.append(class_id)
 
-    indexes = cv2.dnn.NMSBoxes(boxes, confidences, min_confidence, 0.4)
-    font = cv2.FONT_HERSHEY_PLAIN
-    print(boxes)
-    for i in range(len(boxes)):
-        if i in indexes:
-            x, y, w, h = boxes[i]
-            label = str(classes[class_ids[i]])
-            print(i, label)
-            color = colors[i]
-            cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-            cv2.putText(img, label, (x, y + 30), font, 2, (0, 255, 0), 1)
+    idxs = cv2.dnn.NMSBoxes(boxes, confidences, min_confidence,
+                            min_confidence)
 
+    # ensure at least one detection exists
+    if len(idxs) > 0:
+        # loop over the indexes we are keeping
+        for i in idxs.flatten():
+            # extract the bounding box coordinates
+            (x, y) = (boxes[i][0], boxes[i][1])
+            (w, h) = (boxes[i][2], boxes[i][3])
+
+            color = [int(c) for c in COLORS[boxes[i]]]
+
+            cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+            text = "{}: {:.4f}".format(LABELS[boxes[i]], confidences[i])
+            cv2.putText(img, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5, color, 2)
+
+    # show the output image
+    cv2.imshow("output", cv2.resize(img, (800, 600)))
+    #writer.write(cv2.resize(img, (800, 600)))
+    cv2.waitKey(1) & 0xFF
+    print(boxes)
     return True if len(boxes) != 0 else len(boxes) == 0
 
 
@@ -121,7 +135,13 @@ def check_person():
             break
 
         # 1..... yolo로 사람이 발견되면 otp 인증을 한다.
-        if person_ditection == isPerson(frame):
+        if person_ditection == True: #isPerson(frame):
+
+            # .... TurtleBot 에게 경로 정보 넘기기
+            import paho.mqtt.client as mqtt
+            mqtt = mqtt.Client("OTP")  # MQTT client 생성, 이름 ""
+            mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
+            mqtt.publish("otp_start", json.dumps({"data": "start"}))  # topic 과 넘겨줄 값
 
             # 2..... OTP 인증 Mode start!!
             otp_client = MQTT_Subscriber("otp")
