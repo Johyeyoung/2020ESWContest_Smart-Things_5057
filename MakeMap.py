@@ -7,7 +7,7 @@ class Realize:
 
 
         self.img = img
-       # self.img = cv2.imread('./container/11.jpg')
+        self.img = cv2.imread('./container/origin.jpg')
         self.img = cv2.resize(self.img, dsize=(400, 400), interpolation=cv2.INTER_AREA)
 
         # 이미지의 기본 속성 (행, 열, channel 정보)
@@ -90,10 +90,13 @@ class Realize:
         target_cndt = []
         contours, hierarchy = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contours:
+            area = cv2.contourArea(cnt)
+            print("area", area)
             epsilon = 0.02 * cv2.arcLength(cnt, True)
             approx = cv2.approxPolyDP(cnt, epsilon, True)
             print(len(approx))
-            if len(approx) > 10:
+            if len(approx) > 5 and 30 > area > 12:
+                print(len(approx), "area:", area)
                 area = cv2.contourArea(cnt)
                 x, y, w, h = cv2.boundingRect(cnt)
                 cx, cy = x + w//2, y + h//2
@@ -104,8 +107,8 @@ class Realize:
             print(target_cndt)
             x, y = target_cndt[0][1], target_cndt[0][2]
             cv2.line(self.img_result2, (x, y), (x, y), (0, 225, 225), 2)
-            cv2.imshow("img_result", self.img_result2)
-            cv2.waitKey(0)
+        cv2.imshow("img_result", self.img_result2)
+        cv2.waitKey(0)
 
         print("target:", y, x)
         return x, y
@@ -276,4 +279,5 @@ if __name__ =='__main__':
     realize = Realize()
     realize.contour()
     realize.delete_destroy()
+    realize.find_target_location()
     realize.draw_result_map()
