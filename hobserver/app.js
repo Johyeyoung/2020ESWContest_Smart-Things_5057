@@ -22,15 +22,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-app.get('/img1', function(req,res){
-  fs.readFile('./public/images/detected/map.jpg', function(error, data){
+var fs = require('fs');
+app.get('/img_result_map', function(req,res){
+  fs.readFile('./public/images/map_results/map_result.jpg', function(error, data){
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(data);
+  
+  });
+});
+app.get('/img_origin', function(req,res){
+  fs.readFile('./public/images/map_origins/map_origin.jpg', function(error, data){
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(data);
   });
 });
-var fs = require('fs');
-app.get('/img2', function(req,res){
-  fs.readFile('./public/images/detected/detect.jpg', function(error, data){
+app.get('/img_intruder', function(req,res){
+  fs.readFile('./public/images/intruders/intruder.jpg', function(error, data){
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(data);
   });

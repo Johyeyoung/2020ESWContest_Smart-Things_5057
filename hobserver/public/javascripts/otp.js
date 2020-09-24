@@ -9,11 +9,11 @@ $(document).ready(function(){
         data = JSON.parse(data);
         console.log(data);
         $(".standby_otp").html('<span>OTP 인증:</span>');
-        if(data.state ==='1'){
+        if(data.text ==='Success'){
             $(".otpInfo").html('<span style="color:red">OTP 인증되었습니다</span>');
-        }else if(data.state ==='0'){
+        }else if(data.text ==='Fail'){
             $(".otpInfo").html('<span style="color:red">OTP 인증실패해습니다</span>');
-        }else if(data.data ==='2'){
+        }else if(data.text ==='Real Fail'){
             $(".otpInfo").html('<span style="color:red">OTP 5회 실패! 관리자 확인 요망</span>');
         }          
     });   
@@ -23,8 +23,6 @@ $(document).ready(function(){
     }     
 });
 function timer1(){
-// 이벤트와 데이터를 소켓으로
-// 그럼 노드제이에스에서 데이터베이스에서 소켓으로 전송.
     socket.emit("otp_state_evt", JSON.stringify({}));
     console.log("_--_--_")
 }

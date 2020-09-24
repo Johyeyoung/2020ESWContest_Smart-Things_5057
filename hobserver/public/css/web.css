@@ -32,34 +32,43 @@
   div.middle{
     /* outline: 1px solid #9F9F9F; */
     margin-top: 10px;
-    width: 1200px;
+    width: 1800px;
     height: 800px;
     position: relative;
   }
   div.middle-left{
   
     position: absolute;
-    /* outline: 1px solid #9F9F9F; */
+    outline: 1px solid #9F9F9F;
     top: 0px;
-    left:20px;
+    left:0px;
     /* padding-left:20px; */
     width: 400px;
-    height: 700px;
+    height: 500px;
   }
   div.middle-middle{
+    outline: 1px solid #9F9F9F;
     position: absolute;
     top: 0px;
     left:400px;
-    width:400px;
-    height: 700px;
+    width:500px;
+    height: 500px;
   }
   div.middle-right{
-    /* outline: 1px solid #9F9F9F; */
+    outline: 1px solid #9F9F9F;
     position: absolute;
     top: 0px;
-    left: 800px;
+    left: 900px;
+    width: 500px;
+    height: 500px;
+  }
+  div.middle-right-side{
+    outline: 1px solid #9F9F9F;
+    position: absolute;
+    top: 0px;
+    left: 1400px;
     width: 400px;
-    height: 700px;
+    height: 500px;
   }
   div.bottom{
     position:absolute;
