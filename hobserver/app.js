@@ -30,19 +30,23 @@ app.get('/img_result_map', function(req,res){
   
   });
 });
-app.get('/img_origin', function(req,res){
-  fs.readFile('./public/images/map_origins/map_origin.jpg', function(error, data){
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(data);
-  });
-});
-app.get('/img_intruder', function(req,res){
-  fs.readFile('./public/images/intruders/intruder.jpg', function(error, data){
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(data);
-  });
-});
-app.use('/otp', express.static('./public/javascripts/otp.js'));
+// app.get('/img_origin', function(req,res){
+//   fs.readFile('./public/images/map_origins/map_origin.jpg', function(error, data){
+//     res.writeHead(200, {'Content-Type': 'text/html'});
+//     res.end(data);
+//   });
+// });
+// app.get('/img_intruder', function(req,res){
+//   fs.readFile('./public/images/intruders/intruder.jpg', function(error, data){
+//     res.writeHead(200, {'Content-Type': 'text/html'});
+//     res.end(data);
+//   });
+// });
+app.use('/event', express.static('./public/javascripts/event.js'));
+// app.use('/map_origin', express.static('./public/javascripts/origin_imgs.js'));
+// app.use('/intruder', express.static('./public/javascripts/intruder.js'));
+// app.use('/map_result', express.static('./public/javascripts/map_result.js'));
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
