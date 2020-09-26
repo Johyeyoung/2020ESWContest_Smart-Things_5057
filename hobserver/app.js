@@ -19,7 +19,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+
+// app.use('/', indexRouter);
+app.get('/', function(req, res){
+  res.sendFile(__dirname+'/public/hobserver.html');
+});
 app.use('/users', usersRouter);
 
 var fs = require('fs');
@@ -30,18 +34,7 @@ app.get('/img_result_map', function(req,res){
   
   });
 });
-// app.get('/img_origin', function(req,res){
-//   fs.readFile('./public/images/map_origins/map_origin.jpg', function(error, data){
-//     res.writeHead(200, {'Content-Type': 'text/html'});
-//     res.end(data);
-//   });
-// });
-// app.get('/img_intruder', function(req,res){
-//   fs.readFile('./public/images/intruders/intruder.jpg', function(error, data){
-//     res.writeHead(200, {'Content-Type': 'text/html'});
-//     res.end(data);
-//   });
-// });
+
 app.use('/event', express.static('./public/javascripts/event.js'));
 // app.use('/map_origin', express.static('./public/javascripts/origin_imgs.js'));
 // app.use('/intruder', express.static('./public/javascripts/intruder.js'));
