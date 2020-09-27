@@ -22,7 +22,11 @@ app.set('port', port);
 
 
 var server = http.createServer(app);
+//socket.io 모듈을 사용 및 create한 http 서버에 전달
+var io = require('socket.io')(server);
 
+// socket.io 의 이벤트 등록 및 위의 socket.io 라이브러리르 socketIoHandler에게 전달
+var socketIoHandler = require('../modules/socketIoHandler.js')(io);
 
 
 /**
@@ -33,7 +37,7 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-app.io.attach(server);
+// app.io.attach(server);
 /**
  * Normalize a port into a number, string, or false.
  */
