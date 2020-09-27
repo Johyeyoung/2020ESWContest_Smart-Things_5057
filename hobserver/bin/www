@@ -19,165 +19,10 @@ app.set('port', port);
  * Create HTTP server.
  */
 
+
+
 var server = http.createServer(app);
 
-// mongoDB 연결
-var mongodb = require('mongodb');
-var mongoDB = require('mongodb').MongoClient;
-var url = 'mongodb://127.0.0.1:27017';
-var fs = require('fs');
-var dbObj = null;
-var otp_db = null;
-mongoDB.connect(url, { useUnifiedTopology: true }, function(err, db){
-  dbObj = db.db('Hobserver');
-  console.log("hobserver db connect~");
-  var bucket = new mongodb.GridFSBucket(dbObj, {
-    chunkSizeBytes:1024,
-    bucketName:'images'
-  });
-  // bucket.openDownloadStreamByName('map_origin.jpg').pipe(
-  //   fs.createWriteStream('./public/images/map_origins/origin.jpg')).on('error',
-  //   function(error) {
-  //       console.log('Error:-', error);
-  //   }).on('finish', function() {
-  //   console.log('done!');
-  // });
-});
-//   bucket.openDownloadStreamByName('map_result.jpg').pipe(
-//     fs.createWriteStream('./public/images/map_results/result.jpg')).on('error',
-//     function(error) {
-//         console.log('Error:-', error);
-//     }).on('finish', function() {
-//     console.log('done2!');
-//   });
-
-//   bucket.openDownloadStreamByName('intruder.jpg', 0).pipe(
-//     fs.createWriteStream('./public/images/intruders/intruder.jpg')).on('error',
-//     function(error) {
-//         console.log('Error:-', error);
-//     }).on('finish', function() {
-//     console.log('done!!!!!');
-//   });
-// });
-
-
-
-// web과 socket 통신
-// 3000번 포트를 소켓으로 만듦. socket은 3000번 포트를 가리킴,
-// io는 3000번 포트가 연결된 소켓
-// 만들어진 소켓 객체가 3000번 포트와 연결될 때 connection이란 이벤트 발생.
-// 이 때 함수 하나가 지정됨. 이 함수 안(괄호)으로 소켓 정보가 들어감.d
-// on은 이벤트("otp_state_evt")를 등록하는 함수.
-// 3000번 포트로 html로 이벤트("otp_state_evt")와 data 를 받아올 때
-// on 뒤의 함수를 실행한다
-
-// dbObj = db.db('Hobserver');
-var io = require('socket.io')(server);
-io.on('connection', function(socket){
-  console.log('server!');
-  socket.on('map_origin_evt', function(data){
-    var files_collection = dbObj.collection('images.files');
-    var chunks_collection = dbObj.collection('images.chunks');
-    files_collection.find({filename:'map_origin.jpg'}).toArray(function(err, docs){
-      if(err){
-        console.log('error1 !');
-      }
-      if(!docs||docs.length===0){
-        console.log('map origin found');
-      }else{
-        //Retrieving the chunks from the db
-        chunks_collection.find({files_id:docs[0]._id}).sort({n:1}).toArray(function(err,  chunks){
-          if(err){
-            console.log('error3');
-          }
-          let fileData = [];
-          for(let i =0;i<chunks.length;i++){
-            fileData.push(chunks[i].data.toString('base64'));
-          }
-          let finalFile = 'data:image/jpeg;base64,'+fileData.join('');
-          console.log('emit map_origin to client and send finalFile');
-          socket.emit('map_origin_evt', finalFile);
-
-        });
-      }
-    });
-    
-  });
-  socket.on('map_result_evt', function(data){
-    var files_collection = dbObj.collection('images.files');
-    var chunks_collection = dbObj.collection('images.chunks');
-    files_collection.find({filename:'map_result.jpg'}).toArray(function(err, docs){
-      if(err){
-        console.log('error1 !');
-      }
-      if(!docs||docs.length===0){
-        console.log('no map_result file found');
-      }else{
-        //Retrieving the chunks from the db
-        chunks_collection.find({files_id:docs[0]._id}).sort({n:1}).toArray(function(err,  chunks){
-          if(err){
-            console.log('error3');
-          }
-          let fileData = [];
-          for(let i =0;i<chunks.length;i++){
-            fileData.push(chunks[i].data.toString('base64'));
-          }
-          let finalFile = 'data:image/jpeg;base64,'+fileData.join('');
-          console.log('emit map_origin to client ');
-          socket.emit('map_result_evt', finalFile);
-
-        });
-      }
-    });
-    
-  });
-  socket.on('intruder_evt', function(data){
-    var files_collection = dbObj.collection('images.files');
-    var chunks_collection = dbObj.collection('images.chunks');
-    files_collection.find({filename:'intruder.jpg'}).toArray(function(err, docs){
-      if(err){
-        console.log('error1 !');
-      }
-      if(!docs||docs.length===0){
-        console.log('no intruder file found');
-      }else{
-        //Retrieving the chunks from the db
-        chunks_collection.find({files_id:docs[0]._id}).sort({n:1}).toArray(function(err,  chunks){
-          if(err){
-            console.log('error3');
-          }
-          let fileData = [];
-          for(let i =0;i<chunks.length;i++){
-            fileData.push(chunks[i].data.toString('base64'));
-          }
-          let finalFile = 'data:image/jpeg;base64,'+fileData.join('');
-          console.log('emit intruder_evt to client and send finalFile');
-          socket.emit('intruder_evt', finalFile);
-
-        });
-      }
-    });
-    
-  });
-  socket.on("otp_state_evt", function(data){
-  
-    console.log('connect socket - otp event')
-    //
-    var otp_value = dbObj.collection('otp_results');
-  
-    otp_value.find({}).sort({_id:-1}).limit(1).toArray(function(err, results){
-      // 에러가 아니면 results 의 데이터들을 hobserver.html 로 보냄
-      // socket을 통해 3000포트로 이벤트("otp_state_evt")와 데이터(JSON.stringify(results[0]))를 보낸다.
-      // JSON 으로 emit(보내다)
-      // console.log(results[0]);
-      if(!err){
-          console.log('otp state emit to client!');
-          socket.emit("otp_state_evt", JSON.stringify(results[0]));
-      }
-    });
-    
-  });
-});
 
 
 /**
@@ -188,6 +33,7 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+app.io.attach(server);
 /**
  * Normalize a port into a number, string, or false.
  */
