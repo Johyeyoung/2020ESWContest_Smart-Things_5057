@@ -19,23 +19,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+
+// app.use('/', indexRouter);
+app.get('/', function(req, res){
+  res.sendFile(__dirname+'/public/hobserver.html');
+});
 app.use('/users', usersRouter);
 
-app.get('/img1', function(req,res){
-  fs.readFile('./public/images/detected/map.jpg', function(error, data){
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(data);
-  });
-});
 var fs = require('fs');
-app.get('/img2', function(req,res){
-  fs.readFile('./public/images/detected/detect.jpg', function(error, data){
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(data);
-  });
-});
-app.use('/otp', express.static('./public/javascripts/otp.js'));
+
+app.use('/event', express.static('./public/javascripts/event.js'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

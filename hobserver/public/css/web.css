@@ -32,34 +32,43 @@
   div.middle{
     /* outline: 1px solid #9F9F9F; */
     margin-top: 10px;
-    width: 1200px;
+    width: 1800px;
     height: 800px;
     position: relative;
   }
   div.middle-left{
   
     position: absolute;
-    /* outline: 1px solid #9F9F9F; */
+    outline: 1px solid #9F9F9F;
     top: 0px;
-    left:20px;
+    left:0px;
     /* padding-left:20px; */
     width: 400px;
-    height: 700px;
+    height: 500px;
   }
   div.middle-middle{
+    outline: 1px solid #9F9F9F;
     position: absolute;
     top: 0px;
     left:400px;
-    width:400px;
-    height: 700px;
+    width:500px;
+    height: 500px;
   }
   div.middle-right{
-    /* outline: 1px solid #9F9F9F; */
+    outline: 1px solid #9F9F9F;
     position: absolute;
     top: 0px;
-    left: 800px;
+    left: 900px;
+    width: 500px;
+    height: 500px;
+  }
+  div.middle-right-side{
+    outline: 1px solid #9F9F9F;
+    position: absolute;
+    top: 0px;
+    left: 1400px;
     width: 400px;
-    height: 700px;
+    height: 500px;
   }
   div.bottom{
     position:absolute;
@@ -71,3 +80,36 @@
   
     color: #fff;
   }
+  .success{
+    font-weight:bold;
+  }
+  
+
+  .blinking{
+    -webkit-animation:blink 1.5s ease-in-out infinite alternate;
+      -moz-animation:blink 1.5s ease-in-out infinite alternate;
+      animation:blink 1.5s ease-in-out infinite alternate;
+      font-weight: bold ;
+    }
+  @-webkit-keyframes blink{
+      0% {opacity:0; color: red;}
+      49%{	color: red;	}
+	    50%{	color: transparent;	}
+	    99%{	color: red;	}
+      100% {opacity:1; color: red ;}
+  }
+  @-moz-keyframes blink{
+      0% {opacity:0; color: red;}
+      49%{	color: red;	}
+	    50%{	color: transparent;	}
+	    99%{	color: red;	}
+      100% {opacity:1; color: red ;}
+  }
+  @keyframes blink{
+      0% {opacity:0; color:red;}
+      49%{	color: red;	}
+	    50%{	color: transparent;	}
+	    99%{	color: red;	}
+      100% {opacity:1; color: red ;}
+  }
+  
