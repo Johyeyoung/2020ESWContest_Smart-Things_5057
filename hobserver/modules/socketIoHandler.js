@@ -3,16 +3,10 @@ exports=module.exports=function(io){
     var mongodb = require('mongodb');
     var mongoDB = require('mongodb').MongoClient;
     var url = 'mongodb://127.0.0.1:27017';
-    var fs = require('fs');
     var dbObj = null;
-    var otp_db = null;
     mongoDB.connect(url, { useUnifiedTopology: true }, function(err, db){
     dbObj = db.db('Hobserver');
     console.log("hobserver db connect~");
-    // var bucket = new mongodb.GridFSBucket(dbObj, {
-    //   chunkSizeBytes:1024,
-    //   bucketName:'images'
-    // });
     });
     io.on('connection', function(socket){
         console.log('server!');
@@ -47,15 +41,15 @@ exports=module.exports=function(io){
             var chunks_collection = dbObj.collection('images.chunks');
             files_collection.find({filename:'map_result.jpg'}).toArray(function(err, docs){
                 if(err){
-                    console.log('error1 !');
+                    console.log('files_collection find error - map_result');
                 }
-                if(!docs||docs.length===0){
-                    console.log('no map_result file found');
+                if(!docs||docs.length === 0){
+                    console.log('docs error');
                 }else{
                     //Retrieving the chunks from the db
                     chunks_collection.find({files_id:docs[0]._id}).sort({n:1}).toArray(function(err,  chunks){
                         if(err){
-                            console.log('error3');
+                            console.log('chunks_collection find error - map_result');
                         }
                         let fileData = [];
                         for(let i =0;i<chunks.length;i++){
@@ -74,15 +68,15 @@ exports=module.exports=function(io){
             var chunks_collection = dbObj.collection('images.chunks');
             files_collection.find({filename:'intruder.jpg'}).toArray(function(err, docs){
                 if(err){
-                    console.log('error1 !');
+                    console.log('files_collection find error - interuder');
                 }
                 if(!docs||docs.length===0){
-                    console.log('no intruder file found');
+                    console.log('chunks_collection find error - interuder');
                 }else{
                     //Retrieving the chunks from the db
                     chunks_collection.find({files_id:docs[0]._id}).sort({n:1}).toArray(function(err,  chunks){
                         if(err){
-                            console.log('error3');
+                            console.log('chunks_collection find error - interuder');
                         }
                         let fileData = [];
                         for(let i =0;i<chunks.length;i++){
@@ -93,15 +87,11 @@ exports=module.exports=function(io){
                         socket.emit('intruder_evt', finalFile);
                     });
                 }
-            });
-            
+            });           
         });
         socket.on("otp_state_evt", function(data){
-        
             console.log('connect socket - otp event')
-            //
             var otp_value = dbObj.collection('otp_results');
-        
             otp_value.find({}).sort({_id:-1}).limit(1).toArray(function(err, results){
             // 에러가 아니면 results 의 데이터들을 hobserver.html 로 보냄
             // socket을 통해 3000포트로 이벤트("otp_state_evt")와 데이터(JSON.stringify(results[0]))를 보낸다.
