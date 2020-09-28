@@ -80,3 +80,36 @@
   
     color: #fff;
   }
+  .success{
+    font-weight:bold;
+  }
+  
+
+  .blinking{
+    -webkit-animation:blink 1.5s ease-in-out infinite alternate;
+      -moz-animation:blink 1.5s ease-in-out infinite alternate;
+      animation:blink 1.5s ease-in-out infinite alternate;
+      font-weight: bold ;
+    }
+  @-webkit-keyframes blink{
+      0% {opacity:0; color: red;}
+      49%{	color: red;	}
+	    50%{	color: transparent;	}
+	    99%{	color: red;	}
+      100% {opacity:1; color: red ;}
+  }
+  @-moz-keyframes blink{
+      0% {opacity:0; color: red;}
+      49%{	color: red;	}
+	    50%{	color: transparent;	}
+	    99%{	color: red;	}
+      100% {opacity:1; color: red ;}
+  }
+  @keyframes blink{
+      0% {opacity:0; color:red;}
+      49%{	color: red;	}
+	    50%{	color: transparent;	}
+	    99%{	color: red;	}
+      100% {opacity:1; color: red ;}
+  }
+  
