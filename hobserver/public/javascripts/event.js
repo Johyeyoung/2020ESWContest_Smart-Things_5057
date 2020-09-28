@@ -24,11 +24,11 @@ $(document).ready(function(){
         //     $(".otpInfo").html('<span style="color:red">인증을 기다리고 있습니다..</span>');
         // }
         if(data.text ==='Success'){
-            $(".otpInfo").html('<span style="color:red">OTP 인증되었습니다</span>');
+            $(".otpInfo").html('<span class="success">OTP 인증되었습니다</span>');
         }else if(data.text ==='Fail'){
-            $(".otpInfo").html('<span style="color:red">OTP 인증 실패했습니다</span>');
+            $(".otpInfo").html('<span class="blinking">OTP 인증 실패했습니다</span>');
         }else if(data.text ==='Real Fail'){
-            $(".otpInfo").html('<span style="color:red">OTP 5회 실패! 관리자 확인 요망</span>');
+            $(".otpInfo").html('<span class="blinking">OTP 5회 실패! 관리자 확인 요망</span>');
         }          
     });       
     if(timer == null){
