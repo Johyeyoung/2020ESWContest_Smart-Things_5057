@@ -19,7 +19,10 @@ $(document).ready(function(){
     socket.on("otp_state_evt",function(data){
         data = JSON.parse(data);
         // console.log(data);
-        $(".standby_otp").html('<span>OTP 인증:</span>');
+        // $(".standby_otp").html('<span>[OTP 인증]</span>');
+        // if(!data){
+        //     $(".otpInfo").html('<span style="color:red">인증을 기다리고 있습니다..</span>');
+        // }
         if(data.text ==='Success'){
             $(".otpInfo").html('<span style="color:red">OTP 인증되었습니다</span>');
         }else if(data.text ==='Fail'){
@@ -36,14 +39,15 @@ $(document).ready(function(){
 });
 function timer1(){
     socket.emit("map_origin_evt", JSON.stringify({}));
-    console.log("_--___1초마다_____--_")
+    console.log("map origin")
     console.log("___________________")
     socket.emit("map_result_evt", JSON.stringify({}));
-    console.log("_--___1초마다_____--_")
-    console.log("______map result______")
+    console.log("map_result")
+    console.log("___________________")
     socket.emit("otp_state_evt", JSON.stringify({}));
-    console.log("_--_otp--_")
+    console.log("otp_state")
+    console.log("___________________")
     socket.emit("intruder_evt", JSON.stringify({}));
-    console.log("_--___intruder_1초마다_____--_")
+    console.log("interuder")
     console.log("___________________")
 }
