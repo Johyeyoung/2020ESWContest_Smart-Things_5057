@@ -26,7 +26,7 @@ $(document).ready(function(){
         if(data.text ==='Success'){
             $(".otpInfo").html('<span style="color:red">OTP 인증되었습니다</span>');
         }else if(data.text ==='Fail'){
-            $(".otpInfo").html('<span style="color:red">OTP 인증실패해습니다</span>');
+            $(".otpInfo").html('<span style="color:red">OTP 인증 실패했습니다</span>');
         }else if(data.text ==='Real Fail'){
             $(".otpInfo").html('<span style="color:red">OTP 5회 실패! 관리자 확인 요망</span>');
         }          
