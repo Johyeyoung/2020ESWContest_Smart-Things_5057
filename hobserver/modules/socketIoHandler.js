@@ -29,7 +29,7 @@ exports=module.exports=function(io){
                         for(let i =0;i<chunks.length;i++){
                             fileData.push(chunks[i].data.toString('base64'));
                         }
-                        let finalFile = 'data:image/jpeg;base64,'+fileData.join('');
+                        let finalFile = 'data:image/jpeg;base64,' + fileData.join('');
                         console.log('emit map_origin to client and send finalFile');
                         socket.emit('map_origin_evt', finalFile);
                     });
@@ -61,7 +61,6 @@ exports=module.exports=function(io){
                     });
                 }
             });
-            
         });
         socket.on('intruder_evt', function(data){
             var files_collection = dbObj.collection('images.files');
@@ -102,7 +101,6 @@ exports=module.exports=function(io){
                     socket.emit("otp_state_evt", JSON.stringify(results[0]));
                 }
             });
-            
         });
     })
 };
