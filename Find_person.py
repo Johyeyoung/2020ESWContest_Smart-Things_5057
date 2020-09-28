@@ -132,7 +132,7 @@ def check_person():
             break
         isPerson(frame)
         # 1..... yolo로 사람이 발견되면 otp 인증을 한다.
-        if person_ditection == True: #isPerson(frame):
+        if person_ditection == isPerson(frame):
 
             # .... TurtleBot 에게 경로 정보 넘기기
             import paho.mqtt.client as mqtt
@@ -160,4 +160,5 @@ def check_person():
 
 
 if __name__ =='__main__':
+    mqtt_Subscriber = MQTT_Subscriber()
     # 사람을 찾는 main 함수

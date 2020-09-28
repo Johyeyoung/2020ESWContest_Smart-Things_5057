@@ -44,4 +44,4 @@ class MongoDB:
 
 if __name__ =='__main__':
     mongo = MongoDB()
-    mongo.storeImg()
+    mongo.storeImg_otp()
