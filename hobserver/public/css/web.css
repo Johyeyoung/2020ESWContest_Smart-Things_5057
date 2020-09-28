@@ -1,115 +1,111 @@
 #turtlebot_streaming_button{
-    border-top-left-radius:15px;
-    border-bottom-left-radius:15px;
-    border-top-right-radius: 15px;
-    border-bottom-right-radius: 15px;
-  }
-  #button_group button{
+  border-top-left-radius:15px;
+  border-bottom-left-radius:15px;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+#button_group button{
   border:3px solid white;
   background-color:rgba(1,1,1,1);
   color:white;
   padding:20px;
   font-size:20px;
   font-weight: 800;
-  }
-  #temp_button{
-    border-top-left-radius:15px;
-    border-bottom-left-radius:15px;
-    border-top-right-radius: 15px;
-    border-bottom-right-radius: 15px;
-  }
-  #button_group button:hover{
-    color:black;
-    background-color:white;
-  }
-  body{
-    font-size:25px;
-    padding-left: 20px;
-    font-family: 'italic';
-    font-weight: 00;
-  }
-  
-  div.middle{
-    /* outline: 1px solid #9F9F9F; */
-    margin-top: 10px;
-    width: 1800px;
-    height: 800px;
-    position: relative;
-  }
-  div.middle-left{
-  
-    position: absolute;
-    outline: 1px solid #9F9F9F;
-    top: 0px;
-    left:0px;
-    /* padding-left:20px; */
-    width: 400px;
-    height: 500px;
-  }
-  div.middle-middle{
-    outline: 1px solid #9F9F9F;
-    position: absolute;
-    top: 0px;
-    left:400px;
-    width:500px;
-    height: 500px;
-  }
-  div.middle-right{
-    outline: 1px solid #9F9F9F;
-    position: absolute;
-    top: 0px;
-    left: 900px;
-    width: 500px;
-    height: 500px;
-  }
-  div.middle-right-side{
-    outline: 1px solid #9F9F9F;
-    position: absolute;
-    top: 0px;
-    left: 1400px;
-    width: 400px;
-    height: 500px;
-  }
-  div.bottom{
-    position:absolute;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    outline: 1px solid #9F9F9F;
-    width: 800px;
-    height: 200px;
-  
-    color: #fff;
-  }
-  .success{
-    font-weight:bold;
-  }
-  
+}
+#temp_button{
+  border-top-left-radius:15px;
+  border-bottom-left-radius:15px;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+#button_group button:hover{
+  color:black;
+  background-color:white;
+}
+body{
+  font-size:25px;
+  padding-left: 20px;
+  font-family: 'italic';
+  font-weight: 00;
+}
+div.middle{
+  /* outline: 1px solid #9F9F9F; */
+  margin-top: 10px;
+  width: 1800px;
+  height: 800px;
+  position: relative;
+}
+div.middle-left{
+  position: absolute;
+  outline: 1px solid #9F9F9F;
+  top: 0px;
+  left:0px;
+  /* padding-left:20px; */
+  width: 400px;
+  height: 500px;
+}
+div.middle-middle{
+  outline: 1px solid #9F9F9F;
+  position: absolute;
+  top: 0px;
+  left:400px;
+  width:500px;
+  height: 500px;
+}
+div.middle-right{
+  outline: 1px solid #9F9F9F;
+  position: absolute;
+  top: 0px;
+  left: 900px;
+  width: 500px;
+  height: 500px;
+}
+div.middle-right-side{
+  outline: 1px solid #9F9F9F;
+  position: absolute;
+  top: 0px;
+  left: 1400px;
+  width: 400px;
+  height: 500px;
+}
+div.bottom{
+  position:absolute;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  outline: 1px solid #9F9F9F;
+  width: 800px;
+  height: 200px;
 
-  .blinking{
-    -webkit-animation:blink 1.5s ease-in-out infinite alternate;
-      -moz-animation:blink 1.5s ease-in-out infinite alternate;
-      animation:blink 1.5s ease-in-out infinite alternate;
-      font-weight: bold ;
-    }
-  @-webkit-keyframes blink{
-      0% {opacity:0; color: red;}
-      49%{	color: red;	}
-	    50%{	color: transparent;	}
-	    99%{	color: red;	}
-      100% {opacity:1; color: red ;}
-  }
-  @-moz-keyframes blink{
-      0% {opacity:0; color: red;}
-      49%{	color: red;	}
-	    50%{	color: transparent;	}
-	    99%{	color: red;	}
-      100% {opacity:1; color: red ;}
-  }
-  @keyframes blink{
-      0% {opacity:0; color:red;}
-      49%{	color: red;	}
-	    50%{	color: transparent;	}
-	    99%{	color: red;	}
-      100% {opacity:1; color: red ;}
-  }
-  
+  color: #fff;
+}
+.success{
+  font-weight:bold;
+}
+.blinking{
+  -webkit-animation:blink 1.5s ease-in-out infinite alternate;
+  -moz-animation:blink 1.5s ease-in-out infinite alternate;
+  animation:blink 1.5s ease-in-out infinite alternate;
+  font-weight: bold ;
+}
+@-webkit-keyframes blink{
+  0% {opacity:0; color: red;}
+  49%{	color: red;	}
+  50%{	color: transparent;	}
+  99%{	color: red;	}
+  100% {opacity:1; color: red ;}
+}
+@-moz-keyframes blink{
+  0% {opacity:0; color: red;}
+  49%{	color: red;	}
+  50%{	color: transparent;	}
+  99%{	color: red;	}
+  100% {opacity:1; color: red ;}
+}
+@keyframes blink{
+  0% {opacity:0; color:red;}
+  49%{	color: red;	}
+  50%{	color: transparent;	}
+  99%{	color: red;	}
+  100% {opacity:1; color: red ;}
+}
+
