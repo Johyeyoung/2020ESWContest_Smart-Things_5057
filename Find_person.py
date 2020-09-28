@@ -8,9 +8,9 @@ mongo = MongoDB()
 
 LABELS_FILE='obj.names'
 CONFIG_FILE='yolov4-tiny-custom.cfg'
-WEIGHTS_FILE='yolov4-tiny-custom_10000.weights'
-min_confidence = 0.5
-H, W=None, None
+WEIGHTS_FILE='yolov4-tiny-custom_3000.weights'
+min_confidence = 0.3
+h, w=None, None
 
 net = cv2.dnn.readNetFromDarknet(CONFIG_FILE, WEIGHTS_FILE)
 layer_names = net.getLayerNames()
@@ -36,7 +36,7 @@ def isPerson(img):
     class_ids = []
     confidences = []
     boxes = []
-
+    (h, w) = img.shape[:2]
     for out in outs:
         for detection in out:
             scores = detection[5:]
@@ -44,16 +44,15 @@ def isPerson(img):
             confidence = scores[class_id]
             if confidence > min_confidence:
                 # Object detected
-                center_x = int(detection[0] * width)
-                center_y = int(detection[1] * height)
-                w = int(detection[2] * width)
-                h = int(detection[3] * height)
+                # center_x = int(detection[0] * width)
+                # center_y = int(detection[1] * height)
+                box = detection[0:4] * np.array([w, h, w, h])
+                (center_x, center_y, width, height) = box.astype("int")
 
                 # Rectangle coordinates
-                x = int(center_x - w / 2)
-                y = int(center_y - h / 2)
-
-                boxes.append([x, y, w, h])
+                x = int(center_x - (width / 2))
+                y = int(center_y - (height / 2))
+                boxes.append([x, y, int(width), int(height)])
                 confidences.append(float(confidence))
                 class_ids.append(class_id)
 
@@ -67,11 +66,10 @@ def isPerson(img):
             # extract the bounding box coordinates
             (x, y) = (boxes[i][0], boxes[i][1])
             (w, h) = (boxes[i][2], boxes[i][3])
-
-            color = [int(c) for c in COLORS[boxes[i]]]
+            color = [int(c) for c in COLORS[class_ids[i]]]
 
             cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-            text = "{}: {:.4f}".format(LABELS[boxes[i]], confidences[i])
+            text = "{}: {:.4f}".format(LABELS[class_ids[i]], confidences[i])
             cv2.putText(img, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
                         0.5, color, 2)
 
@@ -79,7 +77,6 @@ def isPerson(img):
     cv2.imshow("output", cv2.resize(img, (800, 600)))
     #writer.write(cv2.resize(img, (800, 600)))
     cv2.waitKey(1) & 0xFF
-    print(boxes)
     return True if len(boxes) != 0 else len(boxes) == 0
 
 
@@ -125,7 +122,7 @@ def check_person():
     person_ditection = False
 
     # 터틀봇 영상 가져오기
-    cap = cv2.VideoCapture('http://192.168.0.32:8080/stream?topic=/usb_cam/image_raw')
+    cap = cv2.VideoCapture(0)
     while True:
         ret, frame = cap.read()
         # 디버깅용
@@ -133,7 +130,7 @@ def check_person():
         cv2.imshow("origin", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
+        isPerson(frame)
         # 1..... yolo로 사람이 발견되면 otp 인증을 한다.
         if person_ditection == True: #isPerson(frame):
 
@@ -164,4 +161,3 @@ def check_person():
 
 if __name__ =='__main__':
     # 사람을 찾는 main 함수
-    check_person()
