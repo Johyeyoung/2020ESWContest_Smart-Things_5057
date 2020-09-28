@@ -15,15 +15,15 @@ exports=module.exports=function(io){
             var chunks_collection = dbObj.collection('images.chunks');
             files_collection.find({filename:'map_origin.jpg'}).toArray(function(err, docs){
                 if(err){
-                    console.log('error1 !');
+                    console.log('files_collection find error - map_origin');
                 }
                 if(!docs||docs.length===0){
-                    console.log('map origin found');
+                    console.log('docs error - map_origin');
                 }else{
                     //Retrieving the chunks from the db
                     chunks_collection.find({files_id:docs[0]._id}).sort({n:1}).toArray(function(err,  chunks){
                         if(err){
-                            console.log('error3');
+                            console.log('chunks_collection find error - map_origin');
                         }
                         let fileData = [];
                         for(let i =0;i<chunks.length;i++){
@@ -44,7 +44,7 @@ exports=module.exports=function(io){
                     console.log('files_collection find error - map_result');
                 }
                 if(!docs||docs.length === 0){
-                    console.log('docs error');
+                    console.log('docs error - map_result');
                 }else{
                     //Retrieving the chunks from the db
                     chunks_collection.find({files_id:docs[0]._id}).sort({n:1}).toArray(function(err,  chunks){
@@ -71,7 +71,7 @@ exports=module.exports=function(io){
                     console.log('files_collection find error - interuder');
                 }
                 if(!docs||docs.length===0){
-                    console.log('chunks_collection find error - interuder');
+                    console.log('docs error - interuder');
                 }else{
                     //Retrieving the chunks from the db
                     chunks_collection.find({files_id:docs[0]._id}).sort({n:1}).toArray(function(err,  chunks){
