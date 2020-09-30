@@ -26,19 +26,18 @@ class DRONE_Client:
 
         # 2nd: 기울어진 최대사각형 "sorted_list[-1]"의 면적을 토대로 적절한 맵이 들어왔나 확인 - 서버로 보낼지 판단
         maxHull = cv2.convexHull(sorted_list[-1])
-        full_area = img.shape[0] * img.shape[1]
         x, y, w, h = cv2.boundingRect(maxHull)
-        area = w * h
 
+        area = w*h
+        full_area = img.shape[0]*img.shape[1]
         # image debugging
         cv2.drawContours(img, [maxHull], 0, (0, 1, 9), 2)
-        cv2.imshow("map", img)
-        print(area)
+
         print(area/full_area)
-        cv2.waitKey(0)
+
 
         # 면적이 일정 비율 이상이면 True
-        return True if area/full_area > 0.6 else False
+        return True if 0.79 > area/full_area > 0.78 else False
 
 
 
@@ -75,3 +74,4 @@ if __name__ =='__main__':
     drone_client = DRONE_Client()
     img = cv2.imread("./container/origin.jpg")
     drone_client.fullMapChecker(img)
+
