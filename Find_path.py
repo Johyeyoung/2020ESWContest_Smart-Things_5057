@@ -88,12 +88,19 @@ class Find_path:
                 pos += str(r[1])
             pos += '/'
         print(pos)
+
+
+        # .....3 mongoDB에 경로 저장하기
+        cv2.imwrite('./container/map_result.jpg', img)
+        img = open('./container/map_result.jpg', 'rb')
+        self.mongo.storeImg_map(img, 'map_result.jpg')  # 넘길 이미지와 이름
+        print("map_result image save!!")
+
         # .... TurtleBot 에게 경로 정보 넘기기
         import paho.mqtt.client as mqtt
         mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
         mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
         mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
-        return img
 
 if __name__ =='__main__':
     img = cv2.imread('./container/66.jpg')

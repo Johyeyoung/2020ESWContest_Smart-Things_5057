@@ -59,11 +59,8 @@ print("____________find_path_____________")
 # decimg = cv2.imread('./container/origin.jpg')
 find_path = Find_path(decimg)
 find_path.bfs()
-map_img = find_path.real_path()
-cv2.imwrite('./container/map_result.jpg', map_img)
-img = open('./container/map_result.jpg', 'rb')
-mongo.storeImg_map(map_img, 'map_result.jpg')  # 넘길 이미지와 이름
-print("map_result image save!!")
+find_path.real_path()
+
 
 
 

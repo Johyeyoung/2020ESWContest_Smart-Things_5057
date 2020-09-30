@@ -6,9 +6,9 @@ import paho.mqtt.client as mqtt
 from MongoDB import *
 mongo = MongoDB()
 
-LABELS_FILE='obj.names'
-CONFIG_FILE='yolov4-tiny-custom.cfg'
-WEIGHTS_FILE='yolov4-tiny-custom_3000.weights'
+LABELS_FILE='./yolo/obj.names'
+CONFIG_FILE='./yolo/yolov4-tiny-custom.cfg'
+WEIGHTS_FILE='./yolo/yolo_turtle.weights'
 min_confidence = 0.3
 h, w=None, None
 
@@ -133,7 +133,7 @@ def check_person():
         isPerson(frame)
         # 1..... yolo로 사람이 발견되면 otp 인증을 한다.
         if person_ditection == isPerson(frame):
-
+            print("Find person -----> OTP ON")
             # .... TurtleBot 에게 경로 정보 넘기기
             import paho.mqtt.client as mqtt
             mqtt = mqtt.Client("OTP")  # MQTT client 생성, 이름 ""
