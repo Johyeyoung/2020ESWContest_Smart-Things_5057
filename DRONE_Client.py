@@ -38,7 +38,7 @@ class DRONE_Client:
         cv2.waitKey(0)
 
         # 면적이 일정 비율 이상이면 True
-        return True if 0.79> area/full_area > 0.78 else False
+        return True if 0.79 > area/full_area > 0.78 else False
 
 
 
