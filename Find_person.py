@@ -122,7 +122,7 @@ def check_person():
     person_ditection = False
 
     # 터틀봇 영상 가져오기
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture('http://192.168.0.32:8080/stream?topic=/usb_cam/image_raw')
     while True:
         ret, frame = cap.read()
         # 디버깅용
