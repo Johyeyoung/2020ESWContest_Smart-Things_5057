@@ -54,6 +54,9 @@ print("Drone image save!!")
 
 
 # ...... 2. 길찾기 시작 및 맵 DB에 저장
+print("____________find_path_____________")
+# drone이 넘겨준 이미지를 이용하여 길찾기 알고리즘
+# decimg = cv2.imread('./container/origin.jpg')
 find_path = Find_path(decimg)
 find_path.bfs()
 map_img = find_path.real_path()
