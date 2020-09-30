@@ -31,7 +31,9 @@ drone_client = DRONE_Client(TCP_IP, TCP_PORT)
 
 # ....... 2nd : 서버에 이미지 전송 시도
 successFrame = 0
-vs = cv2.VideoCapture("demo.mp4")
+# vs = cv2.VideoCapture("demo.mp4")
+vs = cv2.VideoCapture("rtsp://192.168.10.2:8554/test")
+
 while vs.isOpened:
 	try:
 		_, image = vs.read()
