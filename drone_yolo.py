@@ -9,8 +9,8 @@ from DRONE_Client import *
 
 LABELS_FILE = 'obj.names'
 CONFIG_FILE = 'yolov4-tiny-custom.cfg'
-WEIGHTS_FILE = 'yolov4-tiny-custom_10000.weights'
-CONFIDENCE_THRESHOLD = 0.3
+WEIGHTS_FILE = 'yolov4-tiny-custom_3000.weights'
+CONFIDENCE_THRESHOLD = 0.9
 H, W = None, None
 fps = FPS().start()
 LABELS = open(LABELS_FILE).read().strip().split("\n")
@@ -26,13 +26,13 @@ ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 ############# Drone 에서 이미지를 받아서 전송하는 부분 ################
 # ....... 1st : 서버와 연결
 TCP_IP = '192.168.0.15'
-TCP_PORT = 5010
+TCP_PORT = 5009
 drone_client = DRONE_Client(TCP_IP, TCP_PORT)
 
 # ....... 2nd : 서버에 이미지 전송 시도
 successFrame = 0
-vs = cv2.VideoCapture(2)
-while True:
+vs = cv2.VideoCapture("demo.mp4")
+while vs.isOpened:
 	try:
 		_, image = vs.read()
 
@@ -88,8 +88,7 @@ while True:
 
 		# ensure at least one detection exists
 		if len(idxs) > 0:
-			cv2.imwrite("test.jpg", cv2.resize(image, (800, 600)))
-			print("img saved")
+			img_tmp = image
 			# loop over the indexes we are keeping
 			for i in idxs.flatten():
 				# extract the bounding box coordinates
@@ -103,10 +102,12 @@ while True:
 				cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 			# ....... 3rd : 이미지에 전체 맵이 담았는지 판단 - 이미지 & 객체 위치
-			correctMap = drone_client.fullMapChecker(image)
+			correctMap = drone_client.fullMapChecker(img_tmp)
 
 			# ....... 4th : 이미지가 전체 맵을 담았다고 판단되면 서버에 전송
 			if correctMap:
+				print("sending")
+				cv2.imwrite("test.jpg", cv2.resize(img_tmp, (800, 600)))
 				drone_client.sendToServer(image, (x + w//2, y + h//2))
 				successFrame += 1
 
@@ -114,7 +115,6 @@ while True:
 		# ....... 5th : 보낸 이미지가 3장이면 소켓 연결 끊고 탈출
 		if successFrame == 8:
 			drone_client.sockClose()
-			break
 
 
 		fps.update()
