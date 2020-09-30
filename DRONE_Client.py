@@ -6,7 +6,7 @@ import json
 
 
 class DRONE_Client:
-    def __init__(self, TCP_IP, TCP_PORT):
+    def __init__(self, TCP_IP=None, TCP_PORT=None):
         # 소켓 생성 및 서버에 연결
         self.sock = socket.socket()
         self.sock.connect((TCP_IP, TCP_PORT))
@@ -26,16 +26,19 @@ class DRONE_Client:
 
         # 2nd: 기울어진 최대사각형 "sorted_list[-1]"의 면적을 토대로 적절한 맵이 들어왔나 확인 - 서버로 보낼지 판단
         maxHull = cv2.convexHull(sorted_list[-1])
-        area = cv2.contourArea(maxHull)
+        full_area = img.shape[0] * img.shape[1]
+        x, y, w, h = cv2.boundingRect(maxHull)
+        area = w * h
 
         # image debugging
         cv2.drawContours(img, [maxHull], 0, (0, 1, 9), 2)
         cv2.imshow("map", img)
         print(area)
+        print(area/full_area)
         cv2.waitKey(0)
 
         # 면적이 일정 비율 이상이면 True
-        return True if area > 150000 else False
+        return True if area/full_area > 0.6 else False
 
 
 
@@ -65,3 +68,10 @@ class DRONE_Client:
 
     def sockClose(self):
         self.sock.close()
+
+
+
+if __name__ =='__main__':
+    drone_client = DRONE_Client()
+    img = cv2.imread("./container/origin.jpg")
+    drone_client.fullMapChecker(img)
