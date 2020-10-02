@@ -25,10 +25,22 @@ app.get('/', function(req, res){
   res.sendFile(__dirname+'/public/hobserver.html');
 });
 app.use('/users', usersRouter);
-
-var fs = require('fs');
-
 app.use('/event', express.static('./public/javascripts/event.js'));
+
+app.io = require('socket.io')();
+// socket.io 의 이벤트 등록 및 위의 socket.io 라이브러리르 socketIoHandler에게 전달
+
+var mongoDB = require('mongodb').MongoClient;
+var url = 'mongodb://127.0.0.1:27017';
+var dbObj = null;
+mongoDB.connect(url, { useUnifiedTopology: true }, function(err, db){
+  dbObj = db.db('Hobserver');
+  console.log("hobserver db connect~");
+  var socketIoImage1 = require('./modules/socketIoImage.js')(app.io, 'map_origin_evt',dbObj,'map_origin.jpg');
+  var socketIoImage2 = require('./modules/socketIoImage.js')(app.io, 'map_result_evt', dbObj,'map_result.jpg');
+  var socketIoImage3 = require('./modules/socketIoImage.js')(app.io, 'intruder_evt', dbObj,'intruder.jpg');
+  var socketIoOTP = require('./modules/socketIoOTP.js')(app.io, dbObj, 'otp_state_evt');
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
