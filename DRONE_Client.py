@@ -4,7 +4,6 @@ import cv2
 import numpy
 import json
 
-
 class DRONE_Client:
     def __init__(self, TCP_IP=None, TCP_PORT=None):
         # 소켓 생성 및 서버에 연결

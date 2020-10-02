@@ -5,6 +5,8 @@ import imutils
 from imutils.video import FPS
 from imutils.video import VideoStream
 from DRONE_Client import *
+from MakeMap import *
+
 
 
 LABELS_FILE = './yolo/obj.names'
@@ -24,6 +26,78 @@ ln = net.getLayerNames()
 ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
 ############# Drone 에서 이미지를 받아서 전송하는 부분 ################
+
+# ....... 0st : 드론 이미지에서 맵만 크롭
+def imgProcessing(img):
+	make_map = MakeMap.Realize(img)
+	make_map.make_contour()
+	make_map.delete_destroy()
+	return make_map.img_result
+
+# ....... 0st : yolo로 객체 확인
+def check_obj_yolo(image):
+	# 이미지 사이즈 읽어들이기
+	blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416), swapRB=True, crop=False)
+	net.setInput(blob)
+	layerOutputs = net.forward(ln)
+
+	boxes = []
+	confidences = []
+	classIDs = []
+
+	# loop over each of the layer outputs
+	for output in layerOutputs:
+		# loop over each of the detections
+		for detection in output:
+			# extract the class ID and confidence (i.e., probability) of
+			# the current object detection
+			scores = detection[5:]
+			classID = np.argmax(scores)
+			confidence = scores[classID]
+
+			# filter out weak predictions by ensuring the detected
+			# probability is greater than the minimum probability
+			if confidence > CONFIDENCE_THRESHOLD:
+				# scale the bounding box coordinates back relative to the
+				# size of the image, keeping in mind that YOLO actually
+				# returns the center (x, y)-coordinates of the bounding
+				# box followed by the boxes' width and height
+				box = detection[0:4] * np.array([W, H, W, H])
+				(centerX, centerY, width, height) = box.astype("int")
+
+				# use the center (x, y)-coordinates to derive the top and
+				# and left corner of the bounding box
+				x = int(centerX - (width / 2))
+				y = int(centerY - (height / 2))
+
+				# update our list of bounding box coordinates, confidences,
+				# and class IDs
+				boxes.append([x, y, int(width), int(height)])
+				confidences.append(float(confidence))
+				classIDs.append(classID)
+
+	# apply non-maxima suppression to suppress weak, overlapping bounding
+	# boxes
+	idxs = cv2.dnn.NMSBoxes(boxes, confidences, CONFIDENCE_THRESHOLD, CONFIDENCE_THRESHOLD)
+	return boxes, confidences, classIDs, idxs
+
+# ...... 0-1st : yolo로 파악된 객체의 위치를 라벨링 및 박스 그리기
+def obj_labeling(boxes, confidences, classIDs, idxs, image):
+	center = []
+	for i in idxs.flatten():
+		# extract the bounding box coordinates
+		(x, y) = (boxes[i][0], boxes[i][1])
+		(w, h) = (boxes[i][2], boxes[i][3])
+		c_x, c_y = x + w/2, y + h/2
+		center.append([c_x, c_y])
+		color = [int(c) for c in COLORS[classIDs[i]]]
+
+		cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
+		text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
+		cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+	return center[0][0], center[0][1]  # 첫번째로 발견된 객체의 중심점
+
+
 # ....... 1st : 서버와 연결
 TCP_IP = '192.168.0.66'
 TCP_PORT = 5009
@@ -33,85 +107,36 @@ drone_client = DRONE_Client(TCP_IP, TCP_PORT)
 successFrame = 0
 # vs = cv2.VideoCapture("demo.mp4")
 vs = cv2.VideoCapture("rtsp://192.168.10.2:8554/test")
-
 while vs.isOpened:
 	try:
 		_, image = vs.read()
+		img_origin = image
 
 		# 이미지 사이즈 읽어들이기
 		if W is None or H is None:
 			H, W = image.shape[:2]
 
-		blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416), swapRB=True, crop=False)
-		net.setInput(blob)
-		layerOutputs = net.forward(ln)
-
-		# initialize our lists of detected bounding boxes, confidences, and
-		# class IDs, respectively
-		boxes = []
-		confidences = []
-		classIDs = []
-
-		# loop over each of the layer outputs
-		for output in layerOutputs:
-			# loop over each of the detections
-			for detection in output:
-				# extract the class ID and confidence (i.e., probability) of
-				# the current object detection
-				scores = detection[5:]
-				classID = np.argmax(scores)
-				confidence = scores[classID]
-
-				# filter out weak predictions by ensuring the detected
-				# probability is greater than the minimum probability
-				if confidence > CONFIDENCE_THRESHOLD:
-					# scale the bounding box coordinates back relative to the
-					# size of the image, keeping in mind that YOLO actually
-					# returns the center (x, y)-coordinates of the bounding
-					# box followed by the boxes' width and height
-					box = detection[0:4] * np.array([W, H, W, H])
-					(centerX, centerY, width, height) = box.astype("int")
-
-					# use the center (x, y)-coordinates to derive the top and
-					# and left corner of the bounding box
-					x = int(centerX - (width / 2))
-					y = int(centerY - (height / 2))
-
-					# update our list of bounding box coordinates, confidences,
-					# and class IDs
-					boxes.append([x, y, int(width), int(height)])
-					confidences.append(float(confidence))
-					classIDs.append(classID)
-
-		# apply non-maxima suppression to suppress weak, overlapping bounding
-		# boxes
-		idxs = cv2.dnn.NMSBoxes(boxes, confidences, CONFIDENCE_THRESHOLD,
-								CONFIDENCE_THRESHOLD)
+		# yolo를 이용하여 객체가 있는지 확인 후 있다면 위치를 담는다
+		boxes, confidences, classIDs, idxs = check_obj_yolo(image)
 
 		# ensure at least one detection exists
 		if len(idxs) > 0:
-			img_tmp = image
-			# loop over the indexes we are keeping
-			for i in idxs.flatten():
-				# extract the bounding box coordinates
-				(x, y) = (boxes[i][0], boxes[i][1])
-				(w, h) = (boxes[i][2], boxes[i][3])
-
-				color = [int(c) for c in COLORS[classIDs[i]]]
-
-				cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
-				text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
-				cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-
 			# ....... 3rd : 이미지에 전체 맵이 담았는지 판단 - 이미지 & 객체 위치
-			correctMap = drone_client.fullMapChecker(img_tmp)
+			correctMap = drone_client.fullMapChecker(img_origin)
 
 			# ....... 4th : 이미지가 전체 맵을 담았다고 판단되면 서버에 전송
 			if correctMap:
-				print("sending")
-				cv2.imwrite("test.jpg", cv2.resize(img_tmp, (800, 600)))
-				drone_client.sendToServer(image, (x + w//2, y + h//2))
-				successFrame += 1
+				############# 객체의 좌표를 구해서 넘겨주기 #################
+				# ...... 4.0 : 왜곡된 사진에서 맵만 추출
+				image = imgProcessing(image)
+				# ...... 4.1 : yolo를 이용하여 객체 위치 다시 update
+				boxes, confidences, classIDs, idxs = check_obj_yolo(image)
+				if idxs:
+					c_x, c_y = obj_labeling(boxes, confidences, classIDs, idxs, image)
+					print("sending")
+					cv2.imwrite("test.jpg", cv2.resize(img_origin, (800, 600)))
+					drone_client.sendToServer(img_origin, (c_x, c_y))
+					successFrame += 1
 
 
 		# ....... 5th : 보낸 이미지가 3장이면 소켓 연결 끊고 탈출
