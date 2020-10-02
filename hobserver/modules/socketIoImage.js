@@ -1,11 +1,4 @@
 module.exports = function(io, event, db,fileName){
-    // var mongoDB = require('mongodb').MongoClient;
-    // var url = 'mongodb://127.0.0.1:27017';
-    // var dbObj = null;
-    // mongoDB.connect(url, { useUnifiedTopology: true }, function(err, db){
-    //     dbObj = db.db('Hobserver');
-    //     console.log("hobserver db connect~");
-    // });
     io.on('connection', function(socket){
         console.log('server!');
         var files_collection = db.collection('images.files');
