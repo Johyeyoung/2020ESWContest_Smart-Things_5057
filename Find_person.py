@@ -8,7 +8,7 @@ mongo = MongoDB()
 
 LABELS_FILE='./yolo/obj.names'
 CONFIG_FILE='./yolo/yolov4-tiny-custom.cfg'
-WEIGHTS_FILE='./yolo/yolo_turtle.weights'
+WEIGHTS_FILE='./yolo/yolov4_turtle.weights'
 min_confidence = 0.3
 h, w=None, None
 

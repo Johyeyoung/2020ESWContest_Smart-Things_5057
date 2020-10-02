@@ -93,9 +93,9 @@ class Find_path:
                 y += int(i[1:])
             elif i[0] == "B":
                 y -= int(i[1:])
-            elif i[0] == "L":
-                x += int(i[1:])
             elif i[0] == "R":
+                x += int(i[1:])
+            elif i[0] == "L":
                 x -= int(i[1:])
 
             cv2.line(img, (post_x, post_y), (x, y), (255, 0, 255), 2)
