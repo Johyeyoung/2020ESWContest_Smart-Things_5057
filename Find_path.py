@@ -85,9 +85,9 @@ class Find_path:
         print(pos)
 
         # 1.... 구해진 맵위에 turtlebot 이 움직일 경로 그려주기
-        pos = pos.split('/')
+        pos_lst = pos.split('/')
         x, y = 0, 0
-        for i in pos[:-1]:
+        for i in pos_lst[:-1]:
             post_x, post_y = x, y
             if i[0] == "G":
                 y += int(i[1:])
