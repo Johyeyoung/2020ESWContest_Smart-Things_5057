@@ -1,21 +1,69 @@
+# -*- coding: utf-8 -*-
 import Jetson.GPIO as GPIO
-import 
+import paho.mqtt.client as mqtt
+import time
+import json 
+from test_ver3 import *
 
 def otp_check():
 	GPIO.setmode(GPIO.BOARD)
 	GPIO.setup(33, GPIO.IN)
-	GPIO.setup(34, GPIO.IN)
+	GPIO.setup(35, GPIO.IN)
+	GPIO.setup(37, GPIO.OUT)
 	count = 0
-	state = 0
+	result = 0
+	GPIO.output(37,GPIO.HIGH)
+	print(1)
+	time.sleep(0.1)
+	GPIO.output(37,GPIO.LOW)
+	print("in")
 	while(1):
 		if GPIO.input(33) == 1:
-			state = 1
+			result = "1"
+			time.sleep(0.5)
+			print(0)
+
 			break
-		elif GPIO.input(34) == 1:
-			starte = 0
-			sleep(1)
+		elif GPIO.input(35) == 1:
+			result = "0"
+			time.sleep(0.5)
+			print(1)
+
 			break
-	return state
+		print("while")
+
+
+	return result
+	
+
+# otp mqtt client s
+def mqtt_client(pos):
+
+	# MQTT client 생성, 이름 
+	mqtt2 = mqtt.Client("OTP")
+	mqtt2.connect("192.168.0.15", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
+	mqtt2.publish("otp_result", pos)  # topic 과 넘겨줄 값	
+
+	
+
+
+class MQTT_Subscriber:
+    def __init__(self):
+
+	pos = 0
+	cnt = 0
+	print("start")
+	while pos != "1":
+		# turn on otp & get data		
+		pos = str(otp_check())
+		mqtt_client(pos)
+		cnt += 1
+		if cnt == 5:
+			break
+
+
+
+
 
 
 

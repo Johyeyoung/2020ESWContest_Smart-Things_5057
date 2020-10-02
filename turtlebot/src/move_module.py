@@ -17,34 +17,39 @@ class Turtlebot_move:
 
         self.LINEAR = 0.1
 
-        self.roll = pitch = yaw = 0.0
+        self.roll = self.pitch = self.yaw = 0.0
         self.current_degree = 0
         self.position_x = 0
         self.position_y = 0
-        self.kp = 0.3
+        self.kp = 0.5
         self.recive_order = ""
+	self.recive_otp_str =""
         self.avg = []
         self.front = 0
+	self.otp_flag = ""
 
 
         rospy.init_node('rotate_robot')
+	self.sub_otp = rospy.Subscriber('/otp_start', String, self.callback_otp)
         self.sub_server = rospy.Subscriber('/test', String, self.callback_server)
+
         self.ack_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
         self.sub = rospy.Subscriber('/odom', Odometry, self.callback)
-        self.sub_lds = rospy.Subscriber('scan', LaserScan, self.callback_lider)
+        self.sub_lds = rospy.Subscriber('scan', LaserScan, self.callback_lidar)
+	
         self.pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
         self.r = rospy.Rate(50)
         self.command = Twist()
         rospy.sleep(2)
-
-        self.recive_order = "G75/R44"
+	self.recive_order="R57/G35"
         self.order = self.recive_order.split("/")
         self.start(self.order)
+	rospy.spin()
 
-        rospy.spin()
-
+        
     # Lider값 가공
-    def callback_lider(self,scan):
+    def callback_lidar(self,scan):
+	
         Front = scan.ranges[0:14] + scan.ranges[345:359]
         Left1 = scan.ranges[15:34]
         Left2 = scan.ranges[35:54]
@@ -74,7 +79,7 @@ class Turtlebot_move:
 
         self.front = scan.ranges[0]
 
-    # lider값 평균 구하기
+    # lidar값 평균 구하기
     def avge(self, arr):
         l = []
         for i in arr:
@@ -89,7 +94,15 @@ class Turtlebot_move:
 
     # 서버로부터 터틀봇의 움직임을 받음
     def callback_server(self, msg):
-        self.recive_order = msg
+	print("receive data from topic 'test'")
+        self.recive_order = msg.data
+
+    
+
+    #recive otp string
+    def callback_otp(self, msg):
+	self.otp_flag = msg.data
+
 
     # 터틀봇의 움직임을 받음
     def callback(self, msg):
@@ -112,15 +125,20 @@ class Turtlebot_move:
         print("okay_2")
 
         dis = dis / 100
-        print(dis)
-        print(type(dis))
         current_front = self.front
         time.sleep(0.1)
-        print(current_front)
         while (not rospy.is_shutdown()):
+
+	    if(self.otp_flag == "start"):
+		self.move(0,0)
+		test_otp.MQTT_Subscriber()
+		self.otp_flag = ""
+		print("find")
+		break
+		
             time.sleep(0.01)
-            self.move(0.05, 0)
-            print("no")
+            self.move(0.1, 0)
+ 
 
             if (self.front - current_front < -1 * 1.5 * dis):
                 continue
@@ -174,9 +192,9 @@ class Turtlebot_move:
             # quat = quaternion_from_euler (roll, pitch,yaw)
             # print quat
             target_rad = 90 * math.pi / 180
-            self.command.angular.z = self.kp * (target_rad - yaw)
+            self.command.angular.z = self.kp * (target_rad - self.yaw)
             self.pub.publish(self.command)
-            print("taeget={} current:{}", self.current_degree, yaw)
+            print("taeget={} current:{}", self.current_degree, self.yaw)
             print(self.command.angular.z)
             self.r.sleep()
             if (int(self.command.angular.z * 100) == 0):
@@ -190,9 +208,9 @@ class Turtlebot_move:
             # quat = quaternion_from_euler (roll, pitch,yaw)
             # print quat
             target_rad = -90 * math.pi / 180
-            self.command.angular.z = self.kp * (target_rad - yaw)
+            self.command.angular.z = self.kp * (target_rad - self.yaw)
             self.pub.publish(self.command)
-            print("taeget={} current:{}", self.current_degree, yaw)
+            print("taeget={} current:{}", self.current_degree, self.yaw)
             print(self.command.angular.z)
             self.r.sleep()
             if (int(self.command.angular.z * 100) == 0):
@@ -218,5 +236,18 @@ class Turtlebot_move:
                 self.move_front(float(order[i][1:]))
             elif order[i][0] == 'B': #뒤로 이동
                 self.move_back(float(order[i][1:]))
+	    else:
+		break
+	while(1):
+	    print("waiting")
+	    if(self.otp_flag == "start"):
+		self.move(0,0)
+		test_otp.MQTT_Subscriber()
+		self.otp_flag = ""
+		print("find")
+		break
 
-Turtlebot_move()
+
+
+
+test = Turtlebot_move()
