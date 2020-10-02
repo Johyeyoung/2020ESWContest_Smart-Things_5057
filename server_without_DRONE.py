@@ -23,19 +23,19 @@ TCP_IP = '192.168.0.66'
 TCP_PORT = 5009
 
 #TCP소켓 열고 수신 대기
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((TCP_IP, TCP_PORT))
-s.listen(True)
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# s.bind((TCP_IP, TCP_PORT))
+# s.listen(True)
 print("_________ SERVER is waiting _________")
-conn, addr = s.accept()
+# conn, addr = s.accept()
 print("_________ SERVER get Data _________")
 
 #String형의 이미지를 수신받아서 이미지로 변환 하고 화면에 출력
-length = recvall(conn, 16) #길이 16의 데이터를 먼저 수신하는 것은 여기에 이미지의 길이를 먼저 받아서 이미지를 받을 때 편리하려고 하는 것이다.
-stringData = recvall(conn, int(length))
-data = numpy.fromstring(stringData, dtype='uint8')
-s.close()  #................이부분 닫지 말까
-decimg = cv2.imdecode(data, 1)
+# length = recvall(conn, 16) #길이 16의 데이터를 먼저 수신하는 것은 여기에 이미지의 길이를 먼저 받아서 이미지를 받을 때 편리하려고 하는 것이다.
+# stringData = recvall(conn, int(length))
+# data = numpy.fromstring(stringData, dtype='uint8')
+# s.close()  #................이부분 닫지 말까
+# decimg = cv2.imdecode(data, 1)
 
 # 이미지 확인하기
 #cv2.imshow('SERVER', decimg)
@@ -47,22 +47,21 @@ mongo = MongoDB()  # mongoDB 객체 생성
 
 
 # ...... 1. save origin image from drone
-cv2.imwrite('./container/origin.jpg', decimg)
-img = open('./container/origin.jpg', 'rb')
-mongo.storeImg_map(img, 'map_origin.jpg')
-print("Drone image save!!")
+# cv2.imwrite('./container/origin.jpg', decimg)
+# img = open('./container/origin.jpg', 'rb')
+# mongo.storeImg_map(img, 'map_origin.jpg')
+# print("Drone image save!!")
 
 
 # ...... 2. 길찾기 시작 및 맵 DB에 저장
 print("____________find_path_____________")
 # drone이 넘겨준 이미지를 이용하여 길찾기 알고리즘
-# decimg = cv2.imread('./container/origin.jpg')
+decimg = cv2.imread('./container/origin.jpg')
 find_path = Find_path(decimg)
 find_path.bfs()
 find_path.real_path()
 
 
-
-
 # Read Turtlebot wabCam and find person
 Find_person.check_person()
+

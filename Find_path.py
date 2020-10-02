@@ -70,7 +70,7 @@ class Find_path:
         arrows = self.arrows.split('/')
         result = [[arrow[0], len(arrow)] for arrow in arrows]
         checked = {'R': -18, "G": -18, "L": -18, "B": -18}
-        checked = {'R': 0, "G": 0, "L": 0, "B": 0}
+        #checked = {'R': 0, "G": 0, "L": 0, "B": 0}
 
         pos = ''
         for r in result:
@@ -93,9 +93,9 @@ class Find_path:
                 y += int(i[1:])
             elif i[0] == "B":
                 y -= int(i[1:])
-            elif i[0] == "R":
-                x += int(i[1:])
             elif i[0] == "L":
+                x += int(i[1:])
+            elif i[0] == "R":
                 x -= int(i[1:])
 
             cv2.line(img, (post_x, post_y), (x, y), (255, 0, 255), 2)

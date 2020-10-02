@@ -7,9 +7,9 @@ from imutils.video import VideoStream
 from DRONE_Client import *
 
 
-LABELS_FILE = 'obj.names'
-CONFIG_FILE = 'yolov4-tiny-custom.cfg'
-WEIGHTS_FILE = 'yolov4-tiny-custom_3000.weights'
+LABELS_FILE = './yolo/obj.names'
+CONFIG_FILE = './yolo/yolov4-tiny-custom.cfg'
+WEIGHTS_FILE = './yolo/yolov4-tiny-custom_3000.weights'
 CONFIDENCE_THRESHOLD = 0.9
 H, W = None, None
 fps = FPS().start()
@@ -25,7 +25,7 @@ ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
 ############# Drone 에서 이미지를 받아서 전송하는 부분 ################
 # ....... 1st : 서버와 연결
-TCP_IP = '192.168.0.15'
+TCP_IP = '192.168.0.66'
 TCP_PORT = 5009
 drone_client = DRONE_Client(TCP_IP, TCP_PORT)
 
