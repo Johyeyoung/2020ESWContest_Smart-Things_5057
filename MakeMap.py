@@ -7,8 +7,8 @@ class Realize:
 
 
         self.img = img
-        # self.img = cv2.imread('./container/origin.jpg')
         self.img = cv2.resize(self.img, dsize=(400, 400), interpolation=cv2.INTER_AREA)
+        #self.img = cv2.imread('./container/origin.jpg')
 
         # 이미지의 기본 속성 (행, 열, channel 정보)
         self.row = self.img.shape[0]  # 행 y
@@ -110,8 +110,8 @@ class Realize:
         cv2.imshow("img_result", self.img_result2)
         cv2.waitKey(0)
 
-        print("target:", y, x)
-        return x, y
+        print("target:", round(y/10), round(x/10))
+        return round(x/10), round(y/10)
 
 
 
@@ -253,6 +253,14 @@ class Realize:
         print('한픽셀에 해당하는 실제 거리(cm):', one_pixel)
         self.img_result = cv2.resize(self.img_result, (150, 150))
 
+        # 자른 이미지들 저장 경로 및 저장
+        cv2.imwrite('./container/map.jpg', self.img_result)
+        cv2.imshow("result_2", self.img_result)
+        cv2.waitKey(0)
+
+        # 맵의 오차범위를 줄이기 위해 터틀봇이 이동할 수 있는 칸의 크기로 0.1배수 줄여준다
+        self.img_result = cv2.resize(self.img_result, None, fx=0.1, fy=0.1, interpolation=cv2.INTER_AREA)
+
         ############## 맵 그리기 -보드판(도로) = 0 / 컨테이너 != 0 ################
         line_info = []
         line_info_str = []
@@ -269,10 +277,7 @@ class Realize:
             drawing = list(map(int, drawing))
             line_info.append(drawing)
 
-        # 자른 이미지들 저장 경로 및 저장
-        cv2.imwrite('./container/map.jpg', self.img_result)
-        cv2.imshow("result_2", self.img_result)
-        cv2.waitKey(0)
+
         return line_info, line_info_str
 
 if __name__ =='__main__':

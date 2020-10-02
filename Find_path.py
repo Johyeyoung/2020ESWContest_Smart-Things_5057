@@ -16,7 +16,6 @@ class Find_path:
         self.map, self.map_str = self.makeMap.draw_result_map()
 
 
-
         # check 맵 초기화
         self.check_map = [[0 for i in range(len(self.map[0]))] for row in range(len(self.map[0]))]
         self.arrow = {(0, 1): "R",  (1, 0): "G", (0, -1): "L", (-1, 0): "B"}  # (y, x)
@@ -65,18 +64,14 @@ class Find_path:
 
     # 최적의 경로를 찾아서 mqtt로 보내고 경로가 담긴 이미지를 반환한다.
     def real_path(self):
-
-        # 1.... 구해진 맵위에 turtlebot이 움직일 경로 그려주기
         img = cv2.imread("./container/map.jpg")
-        for p in range(len(self.path)):
-            x, y = self.path[p][0], self.path[p][1]
-            cv2.line(img, (x, y), (x, y), (255, 0, 255), 2)
-        cv2.line(img, (self.target_x, self.target_y), (self.target_x, self.target_y), (255, 255, 255), 5)
 
         # 2.... TurtleBot 에게 경로 정보 넘기기
         arrows = self.arrows.split('/')
         result = [[arrow[0], len(arrow)] for arrow in arrows]
         checked = {'R': -18, "G": -18, "L": -18, "B": -18}
+        checked = {'R': 0, "G": 0, "L": 0, "B": 0}
+
         pos = ''
         for r in result:
             if checked[r[0]] < 0:
@@ -85,9 +80,25 @@ class Find_path:
                 pos += str(checked[r[0]])  # 방향
             else:
                 pos += r[0]
-                pos += str(r[1])
+                pos += str(r[1]*10)
             pos += '/'
         print(pos)
+
+        # 1.... 구해진 맵위에 turtlebot 이 움직일 경로 그려주기
+        pos = pos.split('/')
+        x, y = 0, 0
+        for i in pos[:-1]:
+            post_x, post_y = x, y
+            if i[0] == "G":
+                y += int(i[1:])
+            elif i[0] == "B":
+                y -= int(i[1:])
+            elif i[0] == "R":
+                x += int(i[1:])
+            elif i[0] == "L":
+                x -= int(i[1:])
+
+            cv2.line(img, (post_x, post_y), (x, y), (255, 0, 255), 2)
 
 
         # .....3 mongoDB에 경로 저장하기
@@ -96,14 +107,14 @@ class Find_path:
         self.mongo.storeImg_map(img, 'map_result.jpg')  # 넘길 이미지와 이름
         print("map_result image save!!")
 
-        # .... TurtleBot 에게 경로 정보 넘기기
+        # .... TurtleBot 에게 MQTT 로 경로 정보 넘기기
         import paho.mqtt.client as mqtt
         mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
         mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
         mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
 
 if __name__ =='__main__':
-    img = cv2.imread('./container/66.jpg')
+    img = cv2.imread('./container/origin.jpg')
     realize = Find_path(img)
     realize.bfs()
     img = realize.real_path()
