@@ -4,6 +4,7 @@ import cv2
 import numpy
 import json
 
+
 class DRONE_Client:
     def __init__(self, TCP_IP=None, TCP_PORT=None):
         # 소켓 생성 및 서버에 연결
@@ -15,7 +16,6 @@ class DRONE_Client:
 
     # 맵이 전체적으로 들어왔는지 확인하기
     def fullMapChecker(self, img):
-
         # 1st: 데모판 영역따기 - findcontour 처리해서 가장 큰 사각형 잡기  -> 기울어짐 제거 작업
         imgray = cv2.GaussianBlur(img, (5, 5), 0)
         imgray = cv2.cvtColor(imgray, cv2.COLOR_BGR2GRAY)
@@ -36,7 +36,7 @@ class DRONE_Client:
 
 
         # 면적이 일정 비율 이상이면 True
-        return True if 0.79 > area/full_area > 0.78 else False
+        return True if 0.75 > area/full_area > 0.73 else False
 
 
 
@@ -45,9 +45,10 @@ class DRONE_Client:
         # 1st: MQTT로 객체 위치 보내주기
         import paho.mqtt.client as mqtt
         obj_x, obj_y = lct[0], lct[1]  # 객체의 위치
+        print(obj_x, obj_y)
         spot = "x{}y{}".format(obj_x, obj_y)
         mqtt = mqtt.Client("objectFinder")  # MQTT client 생성, 이름
-        mqtt.connect('192.168.0.15', 1883)  # 로컬호스트에 있는 MQTT서버에 접속
+        mqtt.connect('192.168.0.66', 1883)  # 로컬호스트에 있는 MQTT서버에 접속
         mqtt.publish("target_location", json.dumps({"data": spot}))  # topic 과 넘겨줄 값
 
 
