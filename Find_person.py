@@ -8,7 +8,7 @@ mongo = MongoDB()
 
 LABELS_FILE='./yolo/obj.names'
 CONFIG_FILE='./yolo/yolov4-tiny-custom.cfg'
-WEIGHTS_FILE='./yolo/yolov4_turtle.weights'
+WEIGHTS_FILE='./yolo/yolo_turtle.weights'
 min_confidence = 0.3
 h, w=None, None
 
@@ -147,15 +147,17 @@ def check_person():
                 otp_result = otp_client.result_msg
                 if otp_result == "Success":
                     print("인증 성공!")
-                    break
-
+                    return True
+                if otp_result == "Time_Over":
+                    print("시간초과!!")
+                    return False  # 다시 드론으로부터 이미지 받아서 추적
                 if otp_client.limit == 5:
                     # 2-1.... 인증시도 5회 만료시, 현장 사진 mongoDB 저장
                     print("관리자 확인 요망!")
                     cv2.imwrite('./otpChecker/intruder.jpg', frame)
                     img = open('./otpChecker/intruder.jpg', 'rb')
                     mongo.storeImg_otp(img, 'intruder.jpg')  # 넘길 이미지와 이름
-                    break
+                    return False # 다시 드론으로부터 이미지 받아서 추적
 
 
 

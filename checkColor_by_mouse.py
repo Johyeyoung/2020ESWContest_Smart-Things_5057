@@ -62,7 +62,7 @@ cv2.setMouseCallback('img_color', mouse_callback)
 
 
 while(True):
-    img_color = cv2.imread('./container/66.jpg')
+    img_color = cv2.imread('./container/0.4485609567901235.jpg')
     img_color = cv2.resize(img_color, dsize=(300, 300))
 
     # 원본 영상을 HSV 영상으로 변환한다
@@ -89,13 +89,16 @@ while(True):
     thr = cv2.Canny(imgray, 10, 200)
     contours, hierarchy = cv2.findContours(img_mask, cv2.RETR_TREE,
                                            cv2.CHAIN_APPROX_SIMPLE)
-    for i in range(len(contours)):
-
-        # 각 등고선마다의 사각형 포인트를 구해, 일정 크기 이상의 사각형만을 반찬으로써 도출
-        cnt = contours[i]
-        x, y, w, h = cv2.boundingRect(cnt)
-        hull = cv2.convexHull(cnt)
-        cv2.drawContours(img_result2, [hull], 0, (0, 255, 0), 3)
+    sorted_list = sorted(contours, key=lambda cc: len(cc))
+    maxHull = cv2.convexHull(sorted_list[-1])
+    cv2.drawContours(img_result2, [maxHull], 0, (225, 255, 255), 3)
+    # for i in range(len(contours)):
+    #
+    #     # 각 등고선마다의 사각형 포인트를 구해, 일정 크기 이상의 사각형만을 반찬으로써 도출
+    #     cnt = contours[i]
+    #     x, y, w, h = cv2.boundingRect(cnt)
+    #     hull = cv2.convexHull(cnt)
+    #     cv2.drawContours(img_result2, [hull], 0, (0, 255, 0), 3)
     minLineLength = 70
     maxLineGap = 30
 
