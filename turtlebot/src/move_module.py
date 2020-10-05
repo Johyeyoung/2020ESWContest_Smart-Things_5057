@@ -12,6 +12,7 @@ import json
 from std_msgs.msg import String
 
 
+
 class Turtlebot_move:
     def __init__(self):
 
@@ -23,14 +24,14 @@ class Turtlebot_move:
         self.position_y = 0
         self.kp = 0.5
         self.recive_order = ""
-	self.recive_otp_str =""
+	    self.recive_otp_str = ""
         self.avg = []
         self.front = 0
-	self.otp_flag = ""
+	    self.otp_flag = ""
 
 
         rospy.init_node('rotate_robot')
-	self.sub_otp = rospy.Subscriber('/otp_start', String, self.callback_otp)
+	    self.sub_otp = rospy.Subscriber('/otp_start', String, self.callback_otp)
         self.sub_server = rospy.Subscriber('/test', String, self.callback_server)
 
         self.ack_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
@@ -41,10 +42,10 @@ class Turtlebot_move:
         self.r = rospy.Rate(50)
         self.command = Twist()
         rospy.sleep(2)
-	self.recive_order="R57/G35"
+	    self.recive_order="R57/G35"
         self.order = self.recive_order.split("/")
         self.start(self.order)
-	rospy.spin()
+	    rospy.spin()
 
         
     # Lider값 가공
@@ -94,14 +95,14 @@ class Turtlebot_move:
 
     # 서버로부터 터틀봇의 움직임을 받음
     def callback_server(self, msg):
-	print("receive data from topic 'test'")
+        print("receive data from topic 'test'")
         self.recive_order = msg.data
 
     
 
     #recive otp string
     def callback_otp(self, msg):
-	self.otp_flag = msg.data
+	    self.otp_flag = msg.data
 
 
     # 터틀봇의 움직임을 받음
@@ -129,12 +130,12 @@ class Turtlebot_move:
         time.sleep(0.1)
         while (not rospy.is_shutdown()):
 
-	    if(self.otp_flag == "start"):
-		self.move(0,0)
-		test_otp.MQTT_Subscriber()
-		self.otp_flag = ""
-		print("find")
-		break
+            if(self.otp_flag == "start"):
+            self.move(0,0)
+            test_otp.MQTT_Subscriber()
+            self.otp_flag = ""
+            print("find")
+            break
 		
             time.sleep(0.01)
             self.move(0.1, 0)
@@ -166,16 +167,13 @@ class Turtlebot_move:
             self.r.sleep()
             if (int(self.command.angular.z * 100) == 0):
                 break
-        print(dis)
-        print(type(dis))
+
         self.lds_move(dis)
 
     def move_back(self, dis):  # 180 방향으로 회
         self.current_degree = 180
 
         while not rospy.is_shutdown():
-            # quat = quaternion_from_euler (roll, pitch,yaw)
-            # print quat
             target_rad = 180 * math.pi / 180
             self.command.angular.z = self.kp * (target_rad - self.yaw)
             self.pub.publish(self.command)
@@ -189,8 +187,7 @@ class Turtlebot_move:
     def move_left(self, dis):  # 90도 방향으로 회전
         self.current_degree = 90
         while not rospy.is_shutdown():
-            # quat = quaternion_from_euler (roll, pitch,yaw)
-            # print quat
+
             target_rad = 90 * math.pi / 180
             self.command.angular.z = self.kp * (target_rad - self.yaw)
             self.pub.publish(self.command)
@@ -205,8 +202,7 @@ class Turtlebot_move:
         self.current_degree = -90
 
         while not rospy.is_shutdown():
-            # quat = quaternion_from_euler (roll, pitch,yaw)
-            # print quat
+
             target_rad = -90 * math.pi / 180
             self.command.angular.z = self.kp * (target_rad - self.yaw)
             self.pub.publish(self.command)
@@ -222,9 +218,7 @@ class Turtlebot_move:
 
     # json으로부터 입력받은 터틀봇의 움직임을 실행
     def start(self, order):
-        print(order)
-        min_move = 0
-        # 터틀봇 움직임의 최소 단위
+
         for i in range(len(order)):
             if order[i][0] == 'R': #오른쪽으로 회전
                 self.move_right(float(order[i][1:]))
@@ -237,7 +231,7 @@ class Turtlebot_move:
             elif order[i][0] == 'B': #뒤로 이동
                 self.move_back(float(order[i][1:]))
 	    else:
-		break
+		    break
 	while(1):
 	    print("waiting")
 	    if(self.otp_flag == "start"):

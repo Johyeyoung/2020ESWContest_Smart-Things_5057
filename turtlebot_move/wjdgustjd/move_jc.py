@@ -18,6 +18,11 @@ import time_over
 class Turtlebot_move:
     def __init__(self):
 
+        self.roll = self.pitch = self.yaw = 0.0
+        self.current_degree = 0  # 터틀봇의 현재 방향
+        self.position_x = 0  # 터틀봇의 x좌표
+        self.position_y = 0  # 터틀봇의 y좌표
+        self.kp = 0.5  # 터틀봇의 회전 속도
         self.recive_order = ""  # 서버로부터의 경로
         self.otp_flag = "lost"
 
@@ -25,6 +30,7 @@ class Turtlebot_move:
         self.sub_otp = rospy.Subscriber('/otp_start', String, self.callback_otp)  # OTP Subscriber
         self.sub_server = rospy.Subscriber('/test', String, self.callback_server)  # 서버로부터 경로를 받는 Subscriber
         self.sub = rospy.Subscriber('/odom', Odometry, self.callback)  # 터틀봇의 위치정보 Subscriber
+        self.sub_lds = rospy.Subscriber('scan', LaserScan, self.callback_lidar)  # Lidar로 부터 위치 정보를 받는 Subscriber
         self.pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)  # 모터 회전 관련 publisher
         self.r = rospy.Rate(50)
         self.command = Twist()
@@ -34,7 +40,6 @@ class Turtlebot_move:
         self.order = self.recive_order.split("/")  # "/" 기준으로 명령을 분리
         self.start(self.order)  # 터틀봇 이동 시작
         rospy.spin()
-
 
     # 서버로부터 터틀봇의 움직임을 받음
     def callback_server(self, msg):
