@@ -41,22 +41,22 @@ div.middle-left{
   top: 0px;
   left:0px;
   /* padding-left:20px; */
-  width: 320px;
+  width: 400px;
   height: 500px;
 }
 div.middle-middle{
   /* outline: 1px solid #9F9F9F; */
   position: absolute;
   top: 0px;
-  left:320px;
-  width:400px;
+  left:420px;
+  width:350px;
   height: 500px;
 }
 div.middle-right{
   /* outline: 1px solid #9F9F9F; */
   position: absolute;
   top: 0px;
-  left: 740px;
+  left: 780px;
   width: 500px;
   height: 500px;
 }
@@ -64,7 +64,7 @@ div.middle-right-side{
   /* outline: 1px solid #9F9F9F; */
   position: absolute;
   top: 0px;
-  left: 1240px;
+  left: 1280px;
   width: 400px;
   height: 500px;
 }

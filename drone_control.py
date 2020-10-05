@@ -12,6 +12,8 @@ def eventAltitude(altitude):
 if __name__=='__main__':
 	
 	drone = Drone()
+	
+	
 	drone.open("COM5")
 	drone.sendLostConnection(1000,1000,5000)
 	drone.setEventHandler(DataType.Altitude, eventAltitude)
@@ -22,10 +24,9 @@ if __name__=='__main__':
 		drone.sendRequest(DeviceType.Drone, DataType.Altitude)
 		sleep(1)
 
-	drone.sendControlPosition(1.0, 1.0, 1.0, 0.5, 0, 0)
-	sleep(1.0)
+	drone.sendControlPosition(1.0, 0.2, 0.7, 0.5, 0, 0)
 	print("Hovering")
-	drone.sendControlWhile(0, 0, 0, 0, 6400)
+	drone.sendControlWhile(0, 0, 0, 0, 10000)
 	sleep(0.01)
 	print("Return Home")
 	drone.sendFlightEvent(FlightEvent.Return)
@@ -41,6 +42,6 @@ if __name__=='__main__':
 	print("Stop")
 	drone.sendStop()
 	sleep(0.01)
-	
+
 drone.close()
 print("All done")
