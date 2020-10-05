@@ -27,6 +27,7 @@ class Detect_Obj_yolo:
 
 	# ....... 0st : 드론 이미지에서 맵만 크롭
 	def imgProcessing(self, img):
+		
 		make_map = Realize(img)
 		make_map.contour()
 		make_map.delete_destroy()
@@ -42,6 +43,7 @@ class Detect_Obj_yolo:
 		boxes = []
 		confidences = []
 		classIDs = []
+		H, W = image.shape[:2]
 
 		# loop over each of the layer outputs
 		for output in layerOutputs:
@@ -82,6 +84,7 @@ class Detect_Obj_yolo:
 	# ...... 0-1st : yolo로 파악된 객체의 위치를 라벨링 및 박스 그리기
 	def obj_labeling(self, boxes, confidences, classIDs, idxs, image):
 		center = []
+		image_tmp = image
 		for i in idxs.flatten():
 			# extract the bounding box coordinates
 			(x, y) = (boxes[i][0], boxes[i][1])
@@ -90,9 +93,9 @@ class Detect_Obj_yolo:
 			center.append([c_x, c_y])
 			color = [int(c) for c in self.COLORS[classIDs[i]]]
 
-			cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
+			cv2.rectangle(image_tmp, (x, y), (x + w, y + h), color, 2)
 			text = "{}: {:.4f}".format(self.LABELS[classIDs[i]], confidences[i])
-			cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+			cv2.putText(image_tmp, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 		return center[0][0], center[0][1]  # 첫번째로 발견된 객체의 중심점
 
 
@@ -108,8 +111,8 @@ fps = FPS().start()
 
 
 # ....... 1st : 서버와 연결 및 필요한 객체들 생성
-TCP_IP = 'localhost'
-TCP_PORT = 5009
+TCP_IP = '192.168.0.15'
+TCP_PORT = 5021
 drone_client = DRONE_Client(TCP_IP, TCP_PORT)
 
 
@@ -121,31 +124,39 @@ vs = cv2.VideoCapture("./container/drone1.mp4")
 while vs.isOpened:
 	_, image = vs.read()
 	img_origin = image
-
-	# 이미지 사이즈 읽어들이기
-	if W is None or H is None:
-		H, W = image.shape[:2]
+		
 
 	# yolo를 이용하여 객체가 있는지 확인 후 있다면 위치를 담는다
 	boxes, confidences, classIDs, idxs = detect_yolo.check_obj_yolo(image)
 	# ensure at least one detection exists
-	if True:# len(idxs) > 0:
+	if len(idxs) > 0:
 					# ....... 3rd : 이미지에 전체 맵이 담았는지 판단 - 이미지 & 객체 위치
 					correctMap = drone_client.fullMapChecker(img_origin)
 					# ....... 4th : 이미지가 전체 맵을 담았다고 판단되면 서버에 전송
-					if correctMap:
+					if correctMap == None:
 							# ...... 4.0 : 왜곡된 사진에서 맵만 추출
 							image = detect_yolo.imgProcessing(image)
+							image = cv2.resize(image,(150,150))
 							# ...... 4.1 : yolo를 이용하여 객체 위치 다시 update
 							boxes, confidences, classIDs, idxs = detect_yolo.check_obj_yolo(image)
-							if True:#len(idxs) > 0:
+							if len(idxs) > 0:
 									print("좌표상에서 객체의 위치를 구합니다.")
-									c_x, c_y = 75, 75
-									#c_x, c_y = detect_yolo.obj_labeling(boxes, confidences, classIDs, idxs, image)
+									(c_x, c_y) = detect_yolo.obj_labeling(boxes, confidences, classIDs, idxs, image)
+									print(c_x,c_y)
 									print("sending")
 									cv2.imwrite("test.jpg", cv2.resize(image, (800, 600)))
-									drone_client.sendToServer(img_origin, (c_x, c_y))
+									drone_client.sendToServer(img_origin, (int(c_x), int(c_y)))
 									successFrame += 1
+									print("___________서버로부터 답변을 기다리고 있습니다.___________")
+									data = drone_client.sockWaitAnswer()
+									print(data)
+									if data == 'DRONE_again':
+										successFrame = 0
+										print("객체를 다시 추적합니다.")
+									elif data == 'DRONE_close':
+										print("객체 찾기 모드를 종료합니다.")
+										drone_client.sockClose()
+
 
 
 	# ....... 5th : 보낸 이미지가 3장이면 서버로부터 응답 기다리기
