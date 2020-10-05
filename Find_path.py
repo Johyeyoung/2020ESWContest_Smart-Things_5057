@@ -3,7 +3,7 @@ import cv2
 from MongoDB import *
 
 class Find_path:
-    def __init__(self, img, location=None):
+    def __init__(self, img, location=None, map=None):
         # 1... map 생성자 객체 생성
         self.makeMap = Realize(img)
         # 2... map의 왜곡없애기
@@ -14,8 +14,7 @@ class Find_path:
         print("경로상의 침입자 위치:", self.target_x, self.target_y)
         #self.target_x, self.target_y = self.makeMap.find_target_location()  # 밀입자의 좌표
         # 3... 맵 만들기
-        self.map, self.map_str = self.makeMap.draw_result_map()
-
+        self.map = map
 
         # check 맵 초기화
         self.check_map = [[0 for i in range(len(self.map[0]))] for row in range(len(self.map[0]))]
@@ -28,12 +27,13 @@ class Find_path:
 
 
     # 최적의 경로를 찾는다
-    def path_algorithm(self):
+    def path_algorithm(self, postLocation):
+        start_x, start_y = postLocation[0], postLocation[1]
         s = self.map
         dx = [1, -1, 0, 0]
         dy = [0, 0, -1, 1]
-        queue = [[0, 0, [], []]]
-        self.check_map[0][0] = 1
+        queue = [[start_x, start_y, [], []]]
+        self.check_map[start_y][start_x] = 1
 
         while queue:
             x, y, path, direction = queue.pop(0)
@@ -54,6 +54,7 @@ class Find_path:
                             queue.append((nx, ny, path+[(nx,ny)], direction + ['/', self.arrow[(dy[i], dx[i])]]))
                         else:
                             queue.append((nx, ny, path+[(nx,ny)], direction + [self.arrow[(dy[i], dx[i])]]))
+
 
 
     # 구해진 최적의 경로를 mqtt로 보내고 경로가 담긴 이미지를 반환한다.
@@ -85,7 +86,11 @@ class Find_path:
 
 
 if __name__ =='__main__':
-    img = cv2.imread('./container/origin.jpg')
-    realize = Find_path(img)
-    realize.path_algorithm()
+    img = cv2.imread('./container/0.4471498842592593.jpg')
+    makeMap = Realize(img)
+    makeMap.contour()
+    makeMap.delete_destroy()
+    map = makeMap.draw_result_map()
+    realize = Find_path(img, [80, 70], map)  # 인덱스 1부터 0부터 세지 말기
+    realize.path_algorithm([1, 0])  # 시작점 인덱스 1부터
     img = realize.real_path()

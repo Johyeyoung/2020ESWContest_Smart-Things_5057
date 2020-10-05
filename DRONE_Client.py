@@ -40,9 +40,10 @@ class DRONE_Client:
             return False
 
 
+
+
+
     def sendToServer(self, img, lct):
-
-
 
         # 1st: 소켓통신 - 추출한 이미지를 String 형태로 변환(인코딩)
         encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
@@ -62,8 +63,11 @@ class DRONE_Client:
 
     def sockClose(self):
         self.sock.close()
-
-
+    def sockWaitAnswer(self):
+        while True:
+            data = self.sock.recv(1024)
+            data = data.decode('utf-8')
+            return data
 
 if __name__ =='__main__':
     drone_client = DRONE_Client()

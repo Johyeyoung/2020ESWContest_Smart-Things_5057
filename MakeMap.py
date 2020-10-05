@@ -3,11 +3,9 @@ import numpy as np
 
 class Realize:
     def __init__(self, img=None):
-
-
         self.img = img
         self.img = cv2.resize(self.img, dsize=(400, 400), interpolation=cv2.INTER_AREA)
-        #self.img = cv2.imread('./container/origin.jpg')
+        #self.img = cv2.imread('./container/origin_state.jpg')
 
         # 이미지의 기본 속성 (행, 열, channel 정보)
         self.row = self.img.shape[0]  # 행 y
@@ -277,7 +275,7 @@ class Realize:
             line_info.append(drawing)
 
 
-        return line_info, line_info_str
+        return line_info
 
 if __name__ =='__main__':
     realize = Realize()

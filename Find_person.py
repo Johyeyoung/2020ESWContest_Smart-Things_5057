@@ -106,6 +106,7 @@ class MQTT_Subscriber:
     def on_message(self, client, userdata, msg):
         input_data = msg.payload.decode()
         self.result_msg = "Success" if input_data == "1" else "Fail"
+        self.result_msg = "Time_Over" if input_data == "3" else "Fail"
         if input_data == "0":
             self.limit += 1
             if self.limit == 5:

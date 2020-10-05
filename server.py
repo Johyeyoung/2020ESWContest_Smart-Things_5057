@@ -1,7 +1,9 @@
 import socket
+import threading
 import cv2
 import numpy
-from Find_path import *
+from MakeMap import *  # 맵 만들기
+from Find_path import *  # 경로 만들기
 from MongoDB import *
 import paho.mqtt.client as mqtt
 import warnings
@@ -19,33 +21,34 @@ def recvall(sock, count):
         count -= len(newbuf)
     return buf
 
-
-
-# .......... 0-1. IP와 port 번호
-TCP_IP = '192.168.35.121'
-TCP_PORT = 5009
 # .......... 0-2. mongoDB 객체 생성
 mongo = MongoDB()
 
+
+# .......... 0-1. 서버의 IP와 port 번호
+TCP_IP = 'localhost'
+TCP_PORT = 5009
+# .......... 1. TCP 소켓 열고 수신 대기
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((TCP_IP, TCP_PORT))
+s.listen(True)
+postLocation = [0, 0]
+map_flag = True # 전체 구역과 관련해 미리 맵을 만든다
+map = None
 while True:
-
-    # .......... 1. TCP 소켓 열고 수신 대기
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((TCP_IP, TCP_PORT))
-    s.listen(True)
-    print("_________ SERVER is waiting _________")
-
-
+    print("#####################################")
+    print("######### SERVER is waiting #########")
+    print("#####################################")
 
     # .......... 2. Client 접속 성공 & data 받기
     conn, addr = s.accept()
     length = recvall(conn, 16)
     stringData = recvall(conn, int(length))
     location = stringData.split(b'\n\b\n\b')[-1].decode()  # x{}:y{}
-    location = list(map(int, location.split(":")))
+    location = [int(i) for i in location.split(":")]
     print("침입자의 위치: ", location)
     data = numpy.fromstring(stringData, dtype='uint8')
-    s.close()
+    #s.close()
     decimg = cv2.imdecode(data, 1)
     print("_________ SERVER get Data _________")
 
@@ -54,39 +57,55 @@ while True:
     #cv2.waitKey(0)
 
 
+    # 맵을 먼저 만든다
+    if map_flag:
+        makeMap = Realize(decimg)
+        makeMap.contour()
+        makeMap.delete_destroy()
+        map = makeMap.draw_result_map()
+        map_flag = False
+
 
     # .......... 3. 이미지(origin.jpg)를 mongoDB에 저장
     cv2.imwrite('./container/origin.jpg', decimg)
     img = open('./container/origin.jpg', 'rb')
-    mongo.storeImg_map(img, 'map_origin.jpg')
+    #mongo.storeImg_map(img, 'map_origin.jpg')
     print("____________Drone image saved!!____________")
-
-
 
 
     # .......... 4. 길찾기 시작
     print("____________경로 탐색 모드가 실행됩니다._____________")
-    find_path = Find_path(decimg, location)
-    find_path.path_algorithm()
-    img, pos = find_path.real_path()
+    if location != postLocation:
+        find_path = Find_path(decimg, location, map)
+        find_path.path_algorithm(postLocation)
+        postLocation = location
+        img, pos = find_path.real_path()
 
-    # .......... 4-1. 경로 맵(map_result.jpg)을 mongoDB에 저장하기
-    cv2.imwrite('./container/map_result.jpg', img)
-    img = open('./container/map_result.jpg', 'rb')
-    mongo.storeImg_map(img, '')
-    print("____________map_result image saved!!____________")
-
-
-    # .......... 4-2. TurtleBot 에게 MQTT 로 경로 정보 넘기기
-    mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
-    mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
-    mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
+        # .......... 4-1. 경로 맵(map_result.jpg)을 mongoDB에 저장하기
+        cv2.imwrite('./container/map_result.jpg', img)
+        img = open('./container/map_result.jpg', 'rb')
+        #mongo.storeImg_map(img, '')
+        print("____________map_result image saved!!____________")
 
 
+        # # .......... 4-2. TurtleBot 에게 MQTT 로 경로 정보 넘기기
+        # mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
+        # mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
+        # mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
+        #
+        #
+
+
+    else:
+        print("이미 경로를 탐색했습니다")
+        break
 
     # .......... 6. Read Turtlebot wabCam and find person
     print("____________객체 추적 모드가 실행됩니다._____________")
-    result = Find_person.check_person()
-    result = False
+    result = False #Find_person.check_person()
     if result == True:
+        conn.send('DRONE_close'.encode('utf-8'))
         break
+    else:
+        # 다시 추적을 위해 드론소켓으로 작동하라는 명령을 내린다
+        conn.send('DRONE_again'.encode('utf-8'))
