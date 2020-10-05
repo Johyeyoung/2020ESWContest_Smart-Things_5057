@@ -69,7 +69,7 @@ while True:
     # .......... 3. 이미지(origin.jpg)를 mongoDB에 저장
     cv2.imwrite('./container/origin.jpg', decimg)
     img = open('./container/origin.jpg', 'rb')
-    #mongo.storeImg_map(img, 'map_origin.jpg')
+    mongo.storeImg_map(img, 'map_origin.jpg')
     print("____________Drone image saved!!____________")
 
 
@@ -84,16 +84,16 @@ while True:
         # .......... 4-1. 경로 맵(map_result.jpg)을 mongoDB에 저장하기
         cv2.imwrite('./container/map_result.jpg', img)
         img = open('./container/map_result.jpg', 'rb')
-        #mongo.storeImg_map(img, '')
+        mongo.storeImg_map(img, '')
         print("____________map_result image saved!!____________")
 
 
-        # # .......... 4-2. TurtleBot 에게 MQTT 로 경로 정보 넘기기
-        # mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
-        # mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
-        # mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
-        #
-        #
+        # .......... 4-2. TurtleBot 에게 MQTT 로 경로 정보 넘기기
+        mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
+        mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
+        mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
+
+
 
 
     else:
