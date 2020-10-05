@@ -3,18 +3,23 @@ var timer = null;
 $(document).ready(function(){
     socket = io.connect(); // 3000 port 웹 서버와 연결
     // nodejs 보낸 데이터를 수신하는 부분
-    // www 파일의 results[0]이 data로
-    console.log('map_result received');
-    socket.on("map_result_evt",function(data){
-        $('.map_result').html("<img src="+data+" weight='400' height='300' alt='waiting'/>");
-    });
+  
     console.log('map_origin received');
     socket.on("map_origin_evt",function(data){
-        $('.map_origin').html("<img src="+data+" weight='400' height='300' alt='waiting'/>");
+        if(!data){$('.map_origin').html("경로 탐색 모드가 실행됩니다.");}
+        $('.map_origin').html("맵을 생성합니다..<br> <img src="+data+" weight='400' height='300' alt='waiting'/>");
+        // 경로 탐색 모드가 실행됩니다
+    });
+    console.log('map_result received');
+    socket.on("map_result_evt",function(data){
+        if(!data){$('.map_result').html("객체를 추적하는 중입니다.");}
+        $('.map_result').html("<br> <img src="+data+" weight='400' height='300' alt='waiting'/> ");
+        
+        // 객체를 추적하는 중입니다
     });
     console.log('intruder_evt received');
     socket.on("intruder_evt",function(data){
-        $('.intruder').html("<img src="+data+" weight='400' height='300' alt='waiting'/>");
+        $('.intruder').html("<br> <img src="+data+" weight='400' height='300' alt='waiting'/>");
     });
     socket.on("otp_state_evt",function(data){
         data = JSON.parse(data);

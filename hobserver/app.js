@@ -4,14 +4,15 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
+var mainRouter = require('./routes/main');
 var usersRouter = require('./routes/users');
 
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'ejs');
+app.engine('html', require('ejs').renderFile);
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -25,6 +26,7 @@ app.get('/', function(req, res){
   res.sendFile(__dirname+'/public/hobserver.html');
 });
 app.use('/users', usersRouter);
+app.use('/', mainRouter);
 app.use('/event', express.static('./public/javascripts/event.js'));
 
 app.io = require('socket.io')();
