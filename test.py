@@ -6,9 +6,9 @@ import paho.mqtt.client as mqtt
 from MongoDB import *
 mongo = MongoDB()
 
-LABELS_FILE='obj.names'
-CONFIG_FILE='yolov4-tiny-custom.cfg'
-WEIGHTS_FILE='yolo_turtle.weights'
+LABELS_FILE='./yolo/obj.names'
+CONFIG_FILE='./yolo/yolov4-tiny-custom.cfg'
+WEIGHTS_FILE='./yolo/yolo_turtle.weights'
 min_confidence = 0.3
 h, w=None, None
 

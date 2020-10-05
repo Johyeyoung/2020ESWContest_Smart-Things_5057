@@ -85,15 +85,15 @@ class Realize:
         imgray = cv2.GaussianBlur(self.img_result2, (5, 5), 0)
         imgray = cv2.cvtColor(imgray, cv2.COLOR_BGR2GRAY)
         canny = cv2.Canny(imgray, 100, 200)
-
+        x, y = 75, 75
         target_cndt = []
         contours, hierarchy = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            print("area", area)
+            #print("area", area)
             epsilon = 0.02 * cv2.arcLength(cnt, True)
             approx = cv2.approxPolyDP(cnt, epsilon, True)
-            print(len(approx))
+            #print(len(approx))
             if len(approx) > 5 and 30 > area > 12:
                 print(len(approx), "area:", area)
                 area = cv2.contourArea(cnt)
@@ -106,8 +106,8 @@ class Realize:
             print(target_cndt)
             x, y = target_cndt[0][1], target_cndt[0][2]
             cv2.line(self.img_result2, (x, y), (x, y), (0, 225, 225), 2)
-        cv2.imshow("img_result", self.img_result2)
-        cv2.waitKey(0)
+        #cv2.imshow("img_result", self.img_result2)
+        #cv2.waitKey(0)
 
         print("target:", round(y/10), round(x/10))
         return round(x/10), round(y/10)
@@ -139,7 +139,7 @@ class Realize:
             for i in range(len(approx)):
                 col_1 = approx[i][:, 0]
                 x_list.append(int(col_1))
-            print(x_list)
+            #print(x_list)
 
 
 
@@ -171,7 +171,7 @@ class Realize:
                 list[i] = 0
             if i < len(list) - 2 and list[i] != 0 and list[i + 1] == 0 and list[i + 2] != 0:
                 list[i + 1] = list[i + 2]
-        print("after:", list)
+        #print("after:", list)
 
 
         # 연속된 0으로 이어지다가 숫자 군집이 나타나면 그 군집의 중앙값을 좌표로 저장한다
@@ -201,11 +201,11 @@ class Realize:
                 if self.canny[i, j] == 7:
                     int7 += 1
             dic_int7.append(int7)
-        print("dic_int7:", dic_int7)
+        #print("dic_int7:", dic_int7)
 
         x_dot = self.get_dot(dic_int7)
         x_dot.append(self.img_result.shape[1])
-        print("x_dox:", x_dot)
+        #print("x_dox:", x_dot)
 
 
         row_dic_int7 = []   # ↓ y 좌표 얻기
@@ -215,10 +215,10 @@ class Realize:
                 if self.canny[i, j] == 7:
                     int7 += 1
             row_dic_int7.append(int7)
-        print("row_dic_int7:", row_dic_int7)
+        #print("row_dic_int7:", row_dic_int7)
         y_dot = self.get_dot(row_dic_int7)
         y_dot.append(self.img_result.shape[0])
-        print("y_dox:", y_dot)
+        #print("y_dox:", y_dot)
         for x in x_dot:
             cv2.line(self.img_result, (x, 0), (x, self.img_result.shape[0]), (0, 225, 225), 2)
         for y in y_dot:
@@ -233,7 +233,7 @@ class Realize:
                     x_gap = x_dot[j+1] - x_dot[j]
                     cX, cY = abs(int(x_dot[j] + x_gap / 2)), abs(int(y_dot[i] + y_gap / 2))
                     cv2.line(self.img_result, (cX, cY), (cX, cY), (255, 0, 255), 4)
-                    if 100 <= imm[cY, cX] <= 255:
+                    if 90 <= imm[cY, cX] <= 255:
                         # 보드판은 검정 사각형으로 그림그리기
                         cv2.rectangle(self.img_result, (x_dot[j], y_dot[i]), (x_dot[j+1], y_dot[i+1]), (0, 0, 0), -1)
                         #print("보드판:", imm[cY, cX])
@@ -254,8 +254,8 @@ class Realize:
 
         # 자른 이미지들 저장 경로 및 저장
         cv2.imwrite('./container/map.jpg', self.img_result)
-        cv2.imshow("result_2", self.img_result)
-        cv2.waitKey(0)
+        #cv2.imshow("result_2", self.img_result)
+        #cv2.waitKey(0)
 
         # 맵의 오차범위를 줄이기 위해 터틀봇이 이동할 수 있는 칸의 크기로 0.1배수 줄여준다
         self.img_result = cv2.resize(self.img_result, None, fx=0.1, fy=0.1, interpolation=cv2.INTER_AREA)

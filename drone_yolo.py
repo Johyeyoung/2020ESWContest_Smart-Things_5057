@@ -9,9 +9,9 @@ from MakeMap import *
 
 
 
-LABELS_FILE = './obj.names'
-CONFIG_FILE = './yolov4-tiny-custom.cfg'
-WEIGHTS_FILE = './yolo_drone.weights'
+LABELS_FILE = './yolo/obj.names'
+CONFIG_FILE = './yolo/yolov4-tiny-custom.cfg'
+WEIGHTS_FILE = './yolo/yolo_drone.weights'
 CONFIDENCE_THRESHOLD = 0.5
 H, W = None, None
 fps = FPS().start()
@@ -30,11 +30,8 @@ ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 # ....... 0st : 드론 이미지에서 맵만 크롭
 def imgProcessing(img):
 	make_map = Realize(img)
-	print(0)
-	make_map.make_contour()
-	print(1)
+	make_map.contour()
 	make_map.delete_destroy()
-	print(2)
 	return make_map.img_result
 
 # ....... 0st : yolo로 객체 확인
@@ -102,62 +99,56 @@ def obj_labeling(boxes, confidences, classIDs, idxs, image):
 
 
 # ....... 1st : 서버와 연결
-TCP_IP = '192.168.0.66'
-TCP_PORT = 4009
+TCP_IP = '192.168.35.121'
+TCP_PORT = 5009
 drone_client = DRONE_Client(TCP_IP, TCP_PORT)
 
 # ....... 2nd : 서버에 이미지 전송 시도
 successFrame = 0
-vs = cv2.VideoCapture("drone.mp4")
+vs = cv2.VideoCapture("./container/drone1.mp4")
 while vs.isOpened:
-	try:
-		_, image = vs.read()
-		img_origin = image
+	_, image = vs.read()
+	img_origin = image
 
-		# 이미지 사이즈 읽어들이기
-		if W is None or H is None:
-			H, W = image.shape[:2]
+	# 이미지 사이즈 읽어들이기
+	if W is None or H is None:
+		H, W = image.shape[:2]
 
-		# yolo를 이용하여 객체가 있는지 확인 후 있다면 위치를 담는다
-		boxes, confidences, classIDs, idxs = check_obj_yolo(image)
-
-		# ensure at least one detection exists
-		if len(idxs) > 0:
-                        print("객체확인!!!")
-                        # ....... 3rd : 이미지에 전체 맵이 담았는지 판단 - 이미지 & 객체 위치
-                        correctMap = drone_client.fullMapChecker(img_origin)
-                        # ....... 4th : 이미지가 전체 맵을 담았다고 판단되면 서버에 전송
-                        if correctMap:
-                                print("전체 맵이 맞습니다")
-				############# 객체의 좌표를 구해서 넘겨주기 #################
-                                # ...... 4.0 : 왜곡된 사진에서 맵만 추출
-                                image = imgProcessing(image)
-                                print("왜곡된 이미지를 조정합니다")
-                                # ...... 4.1 : yolo를 이용하여 객체 위치 다시 update
-                                boxes, confidences, classIDs, idxs = check_obj_yolo(image)
-                                if len(idxs) > 0:
-                                        print("좌표상에서 객체의 위치를 구합니다.")
-                                        c_x, c_y = obj_labeling(boxes, confidences, classIDs, idxs, image)
-                                        print("sending")
-                                        cv2.imwrite("test.jpg", cv2.resize(img_origin, (800, 600)))
-                                        drone_client.sendToServer(img_origin, (c_x, c_y))
-                                        successFrame += 1
+	# yolo를 이용하여 객체가 있는지 확인 후 있다면 위치를 담는다
+	boxes, confidences, classIDs, idxs = check_obj_yolo(image)
+	# ensure at least one detection exists
+	if True: #len(idxs) > 0:
+					# ....... 3rd : 이미지에 전체 맵이 담았는지 판단 - 이미지 & 객체 위치
+					correctMap = drone_client.fullMapChecker(img_origin)
+					# ....... 4th : 이미지가 전체 맵을 담았다고 판단되면 서버에 전송
+					if correctMap:
+							# ...... 4.0 : 왜곡된 사진에서 맵만 추출
+							image = imgProcessing(image)
+							# ...... 4.1 : yolo를 이용하여 객체 위치 다시 update
+							boxes, confidences, classIDs, idxs = check_obj_yolo(image)
+							if True:# len(idxs) > 0:
+									print("좌표상에서 객체의 위치를 구합니다.")
+									#c_x, c_y = obj_labeling(boxes, confidences, classIDs, idxs, image)
+									c_x, c_y = 75, 75
+									print("sending")
+									cv2.imwrite("test.jpg", cv2.resize(image, (800, 600)))
+									drone_client.sendToServer(img_origin, (c_x, c_y))
+									successFrame += 1
 
 
-		# ....... 5th : 보낸 이미지가 3장이면 소켓 연결 끊고 탈출
-		if successFrame == 8:
-			drone_client.sockClose()
+	# ....... 5th : 보낸 이미지가 3장이면 소켓 연결 끊고 탈출
+	if successFrame == 8:
+		drone_client.sockClose()
 
 
-		fps.update()
+	fps.update()
 
-		# show the output image
-		cv2.imshow("output", cv2.resize(image, (800, 600)))
-		if cv2.waitKey(1) & 0xFF == ord("q"):
-			break
-
-	except:
+	# show the output image
+	cv2.imshow("output", cv2.resize(image, (800, 600)))
+	if cv2.waitKey(1) & 0xFF == ord("q"):
 		break
+
+
 
 
 fps.stop()

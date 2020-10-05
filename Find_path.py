@@ -1,37 +1,34 @@
 from MakeMap import *
 import cv2
 from MongoDB import *
-import json
 
 class Find_path:
-    def __init__(self, img):
+    def __init__(self, img, location=None):
         # 1... map 생성자 객체 생성
         self.makeMap = Realize(img)
         # 2... map의 왜곡없애기
         self.makeMap.contour()
         self.makeMap.delete_destroy()
         # 4... 침입자의 위치 알아내기
-        self.target_x, self.target_y = self.makeMap.find_target_location()  # 밀입자의 좌표
+        self.target_x, self.target_y = round(location[0]/10), round(location[1] / 10)  # 밀입자의 좌표
+        print("경로상의 침입자 위치:", self.target_x, self.target_y)
+        #self.target_x, self.target_y = self.makeMap.find_target_location()  # 밀입자의 좌표
         # 3... 맵 만들기
         self.map, self.map_str = self.makeMap.draw_result_map()
 
 
         # check 맵 초기화
         self.check_map = [[0 for i in range(len(self.map[0]))] for row in range(len(self.map[0]))]
-        self.arrow = {(0, 1): "R",  (1, 0): "G", (0, -1): "L", (-1, 0): "B"}  # (y, x)
+        self.arrow = {(0, 1): "L",  (1, 0): "G", (0, -1): "R", (-1, 0): "B"}  # (y, x)
 
-        self.dx = [1, 0, -1, 0]
-        self.dy = [0, 1, 0, -1]
-        self.min = 1000000
-        self.path = []
         self.arrows = ''
 
         # mongoDB 객체 생성
         self.mongo = MongoDB()
 
 
-
-    def bfs(self):
+    # 최적의 경로를 찾는다
+    def path_algorithm(self):
         s = self.map
         dx = [1, -1, 0, 0]
         dy = [0, 0, -1, 1]
@@ -43,11 +40,8 @@ class Find_path:
 
             if x == self.target_x - 1 and y == self.target_y - 1:
                 # 최종 경로 도착
-                print(self.check_map[y][x])
                 print("".join(direction))
                 self.arrows = "".join(direction)
-                self.path = path
-                print(path)
                 break
 
             for i in range(4):
@@ -62,61 +56,36 @@ class Find_path:
                             queue.append((nx, ny, path+[(nx,ny)], direction + [self.arrow[(dy[i], dx[i])]]))
 
 
-    # 최적의 경로를 찾아서 mqtt로 보내고 경로가 담긴 이미지를 반환한다.
+    # 구해진 최적의 경로를 mqtt로 보내고 경로가 담긴 이미지를 반환한다.
     def real_path(self):
         img = cv2.imread("./container/map.jpg")
 
         # 2.... TurtleBot 에게 경로 정보 넘기기
         arrows = self.arrows.split('/')
-        result = [[arrow[0], len(arrow)] for arrow in arrows]
-        checked = {'R': -18, "G": -18, "L": -18, "B": -18}
-        #checked = {'R': 0, "G": 0, "L": 0, "B": 0}
-
-        pos = ''
-        for r in result:
-            if checked[r[0]] < 0:
-                checked[r[0]] += r[1]
-                pos += r[0]
-                pos += str(checked[r[0]])  # 방향
-            else:
-                pos += r[0]
-                pos += str(r[1]*10)
-            pos += '/'
+        result = [a[0]+str(len(a)*10) for a in arrows]
+        pos = '/'.join(result)
         print(pos)
 
         # 1.... 구해진 맵위에 turtlebot 이 움직일 경로 그려주기
         pos_lst = pos.split('/')
         x, y = 0, 0
-        for i in pos_lst[:-1]:
+        for i in pos_lst:
             post_x, post_y = x, y
             if i[0] == "G":
                 y += int(i[1:])
             elif i[0] == "B":
                 y -= int(i[1:])
-            elif i[0] == "R":
-                x += int(i[1:])
             elif i[0] == "L":
+                x += int(i[1:])
+            elif i[0] == "R":
                 x -= int(i[1:])
-
             cv2.line(img, (post_x, post_y), (x, y), (255, 0, 255), 2)
 
+        return img, pos
 
-        # .....3 mongoDB에 경로 저장하기
-        cv2.imwrite('./container/map_result.jpg', img)
-        img = open('./container/map_result.jpg', 'rb')
-        self.mongo.storeImg_map(img, 'map_result.jpg')  # 넘길 이미지와 이름
-        print("map_result image save!!")
-
-        # .... TurtleBot 에게 MQTT 로 경로 정보 넘기기
-        import paho.mqtt.client as mqtt
-        mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
-        mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
-        mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
 
 if __name__ =='__main__':
     img = cv2.imread('./container/origin.jpg')
     realize = Find_path(img)
-    realize.bfs()
+    realize.path_algorithm()
     img = realize.real_path()
-    cv2.imshow('get_map', img)
-    cv2.waitKey(0)
