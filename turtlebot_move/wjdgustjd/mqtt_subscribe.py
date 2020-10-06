@@ -45,13 +45,11 @@ class Turtlebot_move:
 
     def otp_start(self):
         if (self.otp_flag == "start"):  # 서버로부터 start를 받았을 경우 otp실행
-            self.move(0, 0)
             test_otp.MQTT_Subscriber()
             self.otp_flag = ""  # OTP_flag 초기화
 
     def otp_lost(self):
         if (self.otp_flag == "lost"):  # 서버로부터 start를 받았을 경우 otp실행
-            self.move(0, 0)
             test_otp.LOST_Subscriber()
             self.otp_flag = ""  # OTP_flag 초기화
 

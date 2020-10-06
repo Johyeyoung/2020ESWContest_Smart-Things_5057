@@ -8,7 +8,6 @@ from geometry_msgs.msg import Twist
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 from nav_msgs.msg import Odometry
 import math
-from std_msgs.msg import String
 import Lidar
 import mqtt_subscribe
 
@@ -31,10 +30,46 @@ class Turtlebot_move:
         self.command = Twist()
         rospy.sleep(2)
 
-        self.recive_order = "G1/L1/G1"  # 경로를 임의로 설정
-        self.order = self.recive_order.split("/")  # "/" 기준으로 명령을 분리
-        self.start(self.order)  # 터틀봇 이동 시작
+        while not rospy.is_shutdown():
+            self.recive_order = "" #서버로부터 명령 초기화
+            while self.recive_order == "":  #서버로부터 경로를 받을떄까지 기다림
+                print("waiting reivd_order")
+
+            self.recive_order="G1/L1/G1" #경로를 임의로 설정
+            self.order = self.recive_order.split("/") # "/" 기준으로 명령을 분리
+            self.start(self.order) #터틀봇 이동 시작
+
+        currnet_time = time.time()
+        #경로 이동후 OTP확인
+        while(True):        #경로이동 완료후 현재 위치에서 10초동안 목표 확인을 기다림
+            if (time.time() - currnet_time > 60):  #목표물을 발견하지 못했을 경우 서버에 알림
+                self.mqtt_sub.otp_lost()
+                break
+
+            elif(self.mqtt_sub.get_otp_flag() == "start"): #목표물을 발견했을 경우 OTP인증 요구
+                self.mqtt_sub.otp_start()
+                break
+
+        self.reverse_order = self.order_reversed(self.order)#경로를 역순으로 정렬
+        self.start(self.reverse_order) #역순으로 정렬된 경로로 이동
+
         rospy.spin()
+
+
+
+    def order_reversed(self, order):
+        order = reversed(order) #경로역순으로 정렬하고 방향을 재조정후 return'
+        for i in range(len(order)):
+            if order[i][0]  == "R":
+                order[i][0] = "L"
+            elif order[i][0] == "L":
+                order[i][0] = "R"
+            elif order[i][0] == "G":
+                order[i][0] = "B"
+            elif order[i][0] == "B":
+                order[i][0] = "G"
+        order = order + "/G10" #원래 앞으로 바라보도록 기본 경로 추가
+        return order
 
 
     # 터틀봇의 움직임을 받음
@@ -65,35 +100,38 @@ class Turtlebot_move:
     # 터틀봇 기본 동작
 
     def move_go(self, dis):
-        for i in range(int(dis)):
-            current_position_x = self.position_x
-            current_position_y = self.position_y
-            if (self.current_degree == 0):
-                while not rospy.is_shutdown():
-                    self.move(0.01, 0)
-                    if (int(self.position_x * 100) >= int((current_position_x + 0.1) * 100)):
-                        self.move_stop()
+        current_position_x = self.position_x
+        current_position_y = self.position_y
 
-                        break
-            elif (self.current_degree == -90):
-                while not rospy.is_shutdown():
-                    self.move(0.01, 0)
-                    if (int(self.position_y * 100) <= int((current_position_y - 0.1) * 100)):
-                        self.move_stop()
-                        break
-            elif (self.current_degree == 90):
-                while not rospy.is_shutdown():
-                    self.move(0.01, 0)
-                    if (int(self.position_y * 100) >= int((current_position_y + 0.1) * 100)):
-                        self.move_stop()
-                        break
-            elif (self.current_degree == 180):
-                while not rospy.is_shutdown():
-                    self.move(0.01, 0)
-                    if (int(self.position_x * 100) <= int((current_position_x - 0.1) * 100)):
-                        self.move_stop()
-                        break
-                        self.move(0, 0)
+        if (self.current_degree == 0):
+            while int(등신 self.position_x * 100) >= int((current_position_x + (0.1 * dis)) * 100):
+                if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
+                    self.mqtt_sub.otp_start()
+                    break
+                self.move(0.01, 0)
+
+
+        elif (self.current_degree == -90):
+            while int(self.position_y * 100) <= int((current_position_y - (0.1 * dis)) * 100):
+                if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
+                    self.mqtt_sub.otp_start()
+                    break
+                self.move(0.01, 0)
+
+
+        elif (self.current_degree == 90):
+            while int(self.position_y * 100) >= int((current_position_y + (0.1 * dis)) * 100):
+                if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
+                    self.mqtt_sub.otp_start()
+                    break
+                self.move(0.01, 0)
+
+        elif (self.current_degree == 180):
+            while int(self.position_x * 100) <= int((current_position_x - (0.1 * dis)) * 100):
+                if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
+                    self.mqtt_sub.otp_start()
+                    break
+                self.move(0.01, 0)
 
 
     def move_front(self, dis):  # 정면으로  회전
@@ -140,13 +178,13 @@ class Turtlebot_move:
         # 터틀봇 움직임의 최소 단위
         for i in range(len(order)):
             if order[i][0] == 'R':  # 오른쪽으로 회전
-                self.move_right(float(order[i][1:]))
+                self.move_right(int(order[i][1:]))
             elif order[i][0] == 'L':  # 왼쪽으로 회전
-                self.move_left(float(order[i][1:]))
+                self.move_left(int(order[i][1:]))
             elif order[i][0] == 'G':  # 앞으로 이동
-                self.move_front(float(order[i][1:]))
+                self.move_front(int(order[i][1:]))
             elif order[i][0] == 'B':  # 뒤로 이동
-                self.move_back(float(order[i][1:]))
+                self.move_back(int(order[i][1:]))
 
         self.move(0, 0)
 

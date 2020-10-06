@@ -47,6 +47,7 @@ class Turtlebot_move:
             self.recive_order="G32/L52/G20" #경로를 임의로 설정
             self.order = self.recive_order.split("/") # "/" 기준으로 명령을 분리
             self.start(self.order) #터틀봇 이동 시작
+
             rospy.spin()
 
         
