@@ -104,7 +104,7 @@ class Turtlebot_move:
         current_position_y = self.position_y
 
         if (self.current_degree == 0):
-            while int(등신 self.position_x * 100) >= int((current_position_x + (0.1 * dis)) * 100):
+            while int(self.position_x * 100) >= int((current_position_x + (0.1 * dis)) * 100):
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
                     break
