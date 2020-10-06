@@ -16,7 +16,7 @@ class MQTT_serve:
         self.otp_flag = "lost"
 
         rospy.Subscriber('/otp_start', String, self.callback_otp)  # OTP Subscriber
-        rospy.Subscriber('/test', String, self.callback_server)  # 서버로부터 경로를 받는 Subscriber
+        rospy.Subscriber('/pass_topic', String, self.callback_server)  # 서버로부터 경로를 받는 Subscriber
 
 
     # 서버로부터 터틀봇의 움직임을 받음

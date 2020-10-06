@@ -58,7 +58,7 @@ class Turtlebot_move:
         current_position_y = self.odom.get_position_y()#현재 y좌표 기록
 
         if (self.current_degree == 0): # 앞으로 이동
-            while int(Odom.get_position_x() * 100) >= int((current_position_x + (0.1 * dis)) * 100): # +x 방향으로 0.1 * dis 만큼 이동했을 경우
+            while int(self.odom.get_position_x() * 100) >= int((current_position_x + (0.1 * dis)) * 100): # +x 방향으로 0.1 * dis 만큼 이동했을 경우
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
                     break
@@ -66,7 +66,7 @@ class Turtlebot_move:
 
 
         elif (self.current_degree == -90): # 오른쪽으로 이동앞
-            while int(Odom.position_y() * 100) <= int((current_position_y - (0.1 * dis)) * 100): # -y 방향으로 0.1 * dis 만큼 이동했을 경우
+            while int(self.odom.position_y() * 100) <= int((current_position_y - (0.1 * dis)) * 100): # -y 방향으로 0.1 * dis 만큼 이동했을 경우
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
                     break
@@ -74,14 +74,14 @@ class Turtlebot_move:
 
 
         elif (self.current_degree == 90): # 왼쪽으로 이동
-            while int(Odom.position_y() * 100) >= int((current_position_y + (0.1 * dis)) * 100): # +y 방향으로 0.1 * dis 만큼 이동했을 경우
+            while int(self.odom.position_y() * 100) >= int((current_position_y + (0.1 * dis)) * 100): # +y 방향으로 0.1 * dis 만큼 이동했을 경우
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
                     break
                 self.move(0.01, 0)
 
         elif (self.current_degree == 180): #뒷쪽으로 이동
-            while int(Odom.get_position_x()  * 100) <= int((current_position_x - (0.1 * dis)) * 100): # -x 방향으로 0.1 * dis 만큼 이동했을 경우
+            while int(self.odom.get_position_x()  * 100) <= int((current_position_x - (0.1 * dis)) * 100): # -x 방향으로 0.1 * dis 만큼 이동했을 경우
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
                     break
