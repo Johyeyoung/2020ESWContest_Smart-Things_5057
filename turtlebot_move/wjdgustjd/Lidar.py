@@ -6,7 +6,6 @@ import math
 
 class Lds:
     def __init__(self):
-        rospy.init_node('turtle_lds')
         self.sub_lds = rospy.Subscriber('scan', LaserScan, self.callback_lidar)  # Lidar로 부터 위치 정보를 받는 Subscriber
         self.right = 0
         self.left = 0

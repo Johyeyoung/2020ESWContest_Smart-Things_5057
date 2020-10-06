@@ -34,11 +34,11 @@ class MQTT_serve:
         return self.otp_flag
 
     def otp_start(self): # OTP인증 시작
-        est_otp.MQTT_Subscriber()
+        test_otp.MQTT_Subscriber()
         self.otp_flag = ""  # OTP_flag 초기화
 
     def otp_lost(self): #객체 재확인 필요 요청
-        test_otp.LOST_Subscriber()
+        time_over.LOST_Subscriber()
         self.otp_flag = ""  # OTP_flag 초기화
 
 

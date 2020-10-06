@@ -5,8 +5,8 @@ import rospy
 import time
 from geometry_msgs.msg import Twist
 import math
-import Lidar
-import mqtt_subscribe
+from Lidar import *
+from mqtt_serve import *
 from odometry import Odom
 
 
@@ -17,8 +17,8 @@ class Turtlebot_move:
         self.kp = 0.5  # 터틀봇의 회전 속도
 
         rospy.init_node('turtle_move')
-        self.mqtt_sub = mqtt_subscribe()
-        self.Lidar = Lidar()
+        self.mqtt_sub = MQTT_serve()
+        self.lidar = Lds()
         self.odom = Odom()
         self.pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)  # 모터 회전 관련 publisher
         self.r = rospy.Rate(50)
@@ -26,7 +26,7 @@ class Turtlebot_move:
 
 
     #움직임이 완료된 경로를 받아 재자리로 돌아가기 위한 경로를 생성
-    def order_reversed(order):
+    def order_reversed(self, order):
         order = list(reversed(order))  # 경로역순으로 정렬하고 방향을 재조정후 return'
         order_change = {"G": "B", "B": "G", "L": "R", "R": "L"}
         for i in range(len(order)):
@@ -52,40 +52,54 @@ class Turtlebot_move:
         self.pub.publish(twist)  # 터틀봇 움직임 요청
 
     # 터틀봇 기본 동작
-
     def move_go(self, dis):
-        current_position_x = self.odom.get_position_x() #현재 x좌표 기록
-        current_position_y = self.odom.get_position_y()#현재 y좌표 기록
 
-        if (self.current_degree == 0): # 앞으로 이동
-            while int(self.odom.get_position_x() * 100) >= int((current_position_x + (0.1 * dis)) * 100): # +x 방향으로 0.1 * dis 만큼 이동했을 경우
+        current_position_x = self.odom.get_position_x()
+        current_position_y = self.odom.get_position_y()
+        if (self.current_degree == 0):
+            while not rospy.is_shutdown():
+                self.move(0.03, 0)
+                if (int(self.odom.get_position_x() * 100) >= int((current_position_x + 0.1 * dis) * 100)):
+                    self.move_stop()
+                    break
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
                     break
-                self.move(0.01, 0)
 
-
-        elif (self.current_degree == -90): # 오른쪽으로 이동앞
-            while int(self.odom.position_y() * 100) <= int((current_position_y - (0.1 * dis)) * 100): # -y 방향으로 0.1 * dis 만큼 이동했을 경우
+        elif (self.current_degree == -90):
+            while not rospy.is_shutdown():
+                self.move(0.03, 0)
+                if (int(self.odom.get_position_y() * 100) <= int((current_position_y - 0.1 * dis) * 100)):
+                    self.move_stop()
+                    break
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
                     break
-                self.move(0.01, 0)
 
-
-        elif (self.current_degree == 90): # 왼쪽으로 이동
-            while int(self.odom.position_y() * 100) >= int((current_position_y + (0.1 * dis)) * 100): # +y 방향으로 0.1 * dis 만큼 이동했을 경우
+        elif (self.current_degree == 90):
+            while not rospy.is_shutdown():
+                self.move(0.03, 0)
+                if (int(self.odom.get_position_y() * 100) >= int((current_position_y + 0.1 * dis) * 100)):
+                    self.move_stop()
+                    break
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
                     break
-                self.move(0.01, 0)
 
-        elif (self.current_degree == 180): #뒷쪽으로 이동
-            while int(self.odom.get_position_x()  * 100) <= int((current_position_x - (0.1 * dis)) * 100): # -x 방향으로 0.1 * dis 만큼 이동했을 경우
+        elif (self.current_degree == 180):
+            while not rospy.is_shutdown():
+                self.move(0.03, 0)
+                if (int(self.odom.get_position_x() * 100) <= int((current_position_x - 0.1 * dis) * 100)):
+                    self.move_stop()
+                    break
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
                     break
-                self.move(0.01, 0)
+
+        self.move(0, 0)
+
+
+
 
 
     def move_front(self, dis):  # 정면으로  회전
@@ -115,7 +129,7 @@ class Turtlebot_move:
 
     def move_turn(self, target_rad): #주어진 각도애 맞춰서 터틀봇 회전
         while not rospy.is_shutdown():
-            self.command.angular.z = self.kp * (target_rad - Odom.get_yaw())  # 현재 각도와 목표 각도에 따라 회전 속도를 조절
+            self.command.angular.z = self.kp * (target_rad - self.odom.get_yaw())  # 현재 각도와 목표 각도에 따라 회전 속도를 조절
             self.pub.publish(self.command)
             self.r.sleep()
             if (int(self.command.angular.z * 100) == 0):
@@ -131,12 +145,12 @@ class Turtlebot_move:
         # 터틀봇 움직임의 최소 단위
         for i in range(len(order)):
             if order[i][0] == 'R':  # 오른쪽으로 회전
-                self.move_right(int(order[i][1:]))
+                self.move_right(int(order[i][1:])/10)
             elif order[i][0] == 'L':  # 왼쪽으로 회전
-                self.move_left(int(order[i][1:]))
+                self.move_left(int(order[i][1:])/10)
             elif order[i][0] == 'G':  # 앞으로 이동
-                self.move_front(int(order[i][1:]))
+                self.move_front(int(order[i][1:])/10)
             elif order[i][0] == 'B':  # 뒤로 이동
-                self.move_back(int(order[i][1:]))
+                self.move_back(int(order[i][1:])/10)
 
         self.move(0, 0)
