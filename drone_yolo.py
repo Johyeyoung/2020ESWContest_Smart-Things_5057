@@ -123,7 +123,7 @@ vs = cv2.VideoCapture("./container/drone3.mp4")
 while vs.isOpened:
 	try:
 		_, image = vs.read()
-		img_origin = cv2.imread("./container/11.jpg")
+		#img_origin = cv2.imread("./container/11.jpg")
 		img_origin = cv2.resize(img_origin, (300, 300))	
 		
 		# yolo를 이용하여 객체가 있는지 확인 후 있다면 위치를 담는다
@@ -140,42 +140,31 @@ while vs.isOpened:
 								# ...... 4.1 : yolo를 이용하여 객체 위치 다시 update
 								boxes, confidences, classIDs, idxs = detect_yolo.check_obj_yolo(image_crop)
 								if len(idxs) > 0:
-										print("좌표상에서 객체의 위치를 구합니다.")
+										print("객체가 발견됐습니다!")
 										(c_x, c_y) = detect_yolo.obj_labeling(boxes, confidences, classIDs, idxs, image)
-										print(c_x,c_y)
-										print("sending")
+										print("-> 객체의 위치 : {}, {}".format(c_x,c_y))
+
+
+										# 사진을 전송하는 부분
 										if successFrame == 0:
 											cv2.imwrite("test.jpg", cv2.resize(image_crop, (800, 600)))
-
 											drone_client.sendToServer(img_origin, (int(c_x), int(c_y)))
-											successFrame += 1
+											successFrame = 1
 
+										# 서버의 답변을 확인하는 부분
 										data = drone_client.sockWaitAnswer()
-										
 										if data != '':
 											print("___________서버로부터 답변이 왔습니다.___________")
-											print(data)
-										
 											if data == 'DRONE_close':
-												print("객체 찾기 모드를 종료합니다.")
+												print("DRONE_close, 객체 찾기 모드를 종료합니다.")
 												drone_client.sockClose()
 												break
 											elif data == "DRONE_again":
-												drone_client.sendToServer(img_origin, (int(c_x), int(c_y)))
+												print("DRONE_again, 객체를 다시 추적합니다.")
+												successFrame = 0
 
 
 
-		# ....... 5th : 보낸 이미지가 3장이면 서버로부터 응답 기다리기
-		#if successFrame == 3:
-		#	print("___________서버로부터 답변을 기다리고 있습니다.___________")
-		#	data = drone_client.sockWaitAnswer()
-		#	print(data)
-		#	if data == 'DRONE_again':
-		#		successFrame = 1
-		#		print("객체를 다시 추적합니다.")
-		#	elif data == 'DRONE_close':
-		#		print("객체 찾기 모드를 종료합니다.")
-		#		drone_client.sockClose()
 
 		fps.update()
 
