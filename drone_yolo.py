@@ -6,8 +6,7 @@ from imutils.video import FPS
 from imutils.video import VideoStream
 from DRONE_Client import *
 from MakeMap import *
-
-
+import sys
 
 class Detect_Obj_yolo:
 	def __init__(self):
@@ -112,7 +111,7 @@ fps = FPS().start()
 
 # ....... 1st : 서버와 연결 및 필요한 객체들 생성
 TCP_IP = '192.168.0.15'
-TCP_PORT = 5021
+TCP_PORT = int(sys.argv[1])
 drone_client = DRONE_Client(TCP_IP, TCP_PORT)
 
 
@@ -120,64 +119,72 @@ drone_client = DRONE_Client(TCP_IP, TCP_PORT)
 
 # ....... 2nd : 서버에 이미지 전송 시도
 successFrame = 0
-vs = cv2.VideoCapture("./container/drone1.mp4")
+vs = cv2.VideoCapture("./container/drone3.mp4")
 while vs.isOpened:
-	_, image = vs.read()
-	img_origin = image
+	try:
+		_, image = vs.read()
+		img_origin = cv2.imread("./container/11.jpg")
+		img_origin = cv2.resize(img_origin, (300, 300))	
 		
+		# yolo를 이용하여 객체가 있는지 확인 후 있다면 위치를 담는다
+		boxes, confidences, classIDs, idxs = detect_yolo.check_obj_yolo(image)
+		# ensure at least one detection exists
+		if len(idxs) > 0:
+						# ....... 3rd : 이미지에 전체 맵이 담았는지 판단 - 이미지 & 객체 위치
+						correctMap = drone_client.fullMapChecker(img_origin)
+						# ....... 4th : 이미지가 전체 맵을 담았다고 판단되면 서버에 전송
+						if correctMap == None:
+								# ...... 4.0 : 왜곡된 사진에서 맵만 추출
+								image_crop = detect_yolo.imgProcessing(image)
+								image_crop = cv2.resize(image_crop,(150,150))
+								# ...... 4.1 : yolo를 이용하여 객체 위치 다시 update
+								boxes, confidences, classIDs, idxs = detect_yolo.check_obj_yolo(image_crop)
+								if len(idxs) > 0:
+										print("좌표상에서 객체의 위치를 구합니다.")
+										(c_x, c_y) = detect_yolo.obj_labeling(boxes, confidences, classIDs, idxs, image)
+										print(c_x,c_y)
+										print("sending")
+										if successFrame == 0:
+											cv2.imwrite("test.jpg", cv2.resize(image_crop, (800, 600)))
 
-	# yolo를 이용하여 객체가 있는지 확인 후 있다면 위치를 담는다
-	boxes, confidences, classIDs, idxs = detect_yolo.check_obj_yolo(image)
-	# ensure at least one detection exists
-	if len(idxs) > 0:
-					# ....... 3rd : 이미지에 전체 맵이 담았는지 판단 - 이미지 & 객체 위치
-					correctMap = drone_client.fullMapChecker(img_origin)
-					# ....... 4th : 이미지가 전체 맵을 담았다고 판단되면 서버에 전송
-					if correctMap == None:
-							# ...... 4.0 : 왜곡된 사진에서 맵만 추출
-							image = detect_yolo.imgProcessing(image)
-							image = cv2.resize(image,(150,150))
-							# ...... 4.1 : yolo를 이용하여 객체 위치 다시 update
-							boxes, confidences, classIDs, idxs = detect_yolo.check_obj_yolo(image)
-							if len(idxs) > 0:
-									print("좌표상에서 객체의 위치를 구합니다.")
-									(c_x, c_y) = detect_yolo.obj_labeling(boxes, confidences, classIDs, idxs, image)
-									print(c_x,c_y)
-									print("sending")
-									cv2.imwrite("test.jpg", cv2.resize(image, (800, 600)))
-									drone_client.sendToServer(img_origin, (int(c_x), int(c_y)))
-									successFrame += 1
-									print("___________서버로부터 답변을 기다리고 있습니다.___________")
-									data = drone_client.sockWaitAnswer()
-									print(data)
-									if data == 'DRONE_again':
-										successFrame = 0
-										print("객체를 다시 추적합니다.")
-									elif data == 'DRONE_close':
-										print("객체 찾기 모드를 종료합니다.")
-										drone_client.sockClose()
+											drone_client.sendToServer(img_origin, (int(c_x), int(c_y)))
+											successFrame += 1
+
+										data = drone_client.sockWaitAnswer()
+										
+										if data != '':
+											print("___________서버로부터 답변이 왔습니다.___________")
+											print(data)
+										
+											if data == 'DRONE_close':
+												print("객체 찾기 모드를 종료합니다.")
+												drone_client.sockClose()
+												break
+											elif data == "DRONE_again":
+												drone_client.sendToServer(img_origin, (int(c_x), int(c_y)))
 
 
 
-	# ....... 5th : 보낸 이미지가 3장이면 서버로부터 응답 기다리기
-	if successFrame == 3:
-		print("___________서버로부터 답변을 기다리고 있습니다.___________")
-		data = drone_client.sockWaitAnswer()
-		print(data)
-		if data == 'DRONE_again':
-			successFrame = 0
-			print("객체를 다시 추적합니다.")
-		elif data == 'DRONE_close':
-			print("객체 찾기 모드를 종료합니다.")
-			drone_client.sockClose()
+		# ....... 5th : 보낸 이미지가 3장이면 서버로부터 응답 기다리기
+		#if successFrame == 3:
+		#	print("___________서버로부터 답변을 기다리고 있습니다.___________")
+		#	data = drone_client.sockWaitAnswer()
+		#	print(data)
+		#	if data == 'DRONE_again':
+		#		successFrame = 1
+		#		print("객체를 다시 추적합니다.")
+		#	elif data == 'DRONE_close':
+		#		print("객체 찾기 모드를 종료합니다.")
+		#		drone_client.sockClose()
 
-	fps.update()
+		fps.update()
 
-	# show the output image
-	cv2.imshow("output", cv2.resize(image, (800, 600)))
-	if cv2.waitKey(1) & 0xFF == ord("q"):
-		break
-
+		# show the output image
+		cv2.imshow("output", cv2.resize(image, (800, 600)))
+		if cv2.waitKey(1) & 0xFF == ord("q"):
+			break
+	except:
+		pass
 
 
 
