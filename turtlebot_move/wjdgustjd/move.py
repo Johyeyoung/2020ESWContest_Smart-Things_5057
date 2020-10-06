@@ -10,21 +10,22 @@ from nav_msgs.msg import Odometry
 import math
 import Lidar
 import mqtt_subscribe
+from odometry import Odom
+
 
 
 class Turtlebot_move:
     def __init__(self):
 
-        self.roll = self.pitch = self.yaw = 0.0
         self.current_degree = 0  # 터틀봇의 현재 방향
-        self.position_x = 0  # 터틀봇의 x좌표
-        self.position_y = 0  # 터틀봇의 y좌표
         self.kp = 0.5  # 터틀봇의 회전 속도
         self.mqtt_sub = mqtt_subscribe()
         self.Lidar = Lidar()
 
         rospy.init_node('turtle_move')
-        self.sub = rospy.Subscriber('/odom', Odometry, self.callback)  # 터틀봇의 위치정보 Subscriber
+        self.odom = Odom()
+
+        # self.sub = rospy.Subscriber('/odom', Odometry, self.callback)  # 터틀봇의 위치정보 Subscriber
         self.pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)  # 모터 회전 관련 publisher
         self.r = rospy.Rate(50)
         self.command = Twist()
@@ -33,7 +34,7 @@ class Turtlebot_move:
         while not rospy.is_shutdown():
             self.recive_order = "" #서버로부터 명령 초기화
             while self.recive_order == "":  #서버로부터 경로를 받을떄까지 기다림
-                print("waiting reivd_order")
+                print("waiting reived_order")
 
             self.recive_order="G1/L1/G1" #경로를 임의로 설정
             self.order = self.recive_order.split("/") # "/" 기준으로 명령을 분리
@@ -41,7 +42,7 @@ class Turtlebot_move:
 
         currnet_time = time.time()
         #경로 이동후 OTP확인
-        while(True):        #경로이동 완료후 현재 위치에서 10초동안 목표 확인을 기다림
+        while True:        #경로이동 완료후 현재 위치에서 10초동안 목표 확인을 기다림
             if (time.time() - currnet_time > 60):  #목표물을 발견하지 못했을 경우 서버에 알림
                 self.mqtt_sub.otp_lost()
                 break
@@ -57,28 +58,7 @@ class Turtlebot_move:
 
 
 
-    def order_reversed(self, order):
-        order = reversed(order) #경로역순으로 정렬하고 방향을 재조정후 return'
-        for i in range(len(order)):
-            if order[i][0]  == "R":
-                order[i][0] = "L"
-            elif order[i][0] == "L":
-                order[i][0] = "R"
-            elif order[i][0] == "G":
-                order[i][0] = "B"
-            elif order[i][0] == "B":
-                order[i][0] = "G"
-        order = order + "/G10" #원래 앞으로 바라보도록 기본 경로 추가
-        return order
 
-
-    # 터틀봇의 움직임을 받음
-    def callback(self, msg):
-        orientation_q = msg.pose.pose.orientation
-        self.position_x = msg.pose.pose.position.x  # 자신의 X 좌표를 받음
-        self.position_y = msg.pose.pose.position.y  # 자신의 Y 좌표를 받음
-        orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]  # 위치 정보 list
-        (self.roll, self.pitch, self.yaw) = euler_from_quaternion(orientation_list)
 
     # 앞으로 움직임(lds 센서를 보면서 좌우의 물체가 일정 가리와 가까워지면 그 반대 방향으로 이동)
     def move(self, linear, angular):
@@ -87,7 +67,7 @@ class Turtlebot_move:
         if (self.lidar.get_right() < 0.2):     #오른쪽에 장애물이 있을 경우 회피
             twist.angular.z = 0.1
 
-        elif (self.lidar.left() < 0.2):    #왼쪽에 장애물이 있을 경우 회피
+        elif (self.lidar.get_left() < 0.2):    #왼쪽에 장애물이 있을 경우 회피
             twist.angular.z = -0.1
 
         else:
@@ -100,8 +80,8 @@ class Turtlebot_move:
     # 터틀봇 기본 동작
 
     def move_go(self, dis):
-        current_position_x = self.position_x #현재 x좌표 기록
-        current_position_y = self.position_y #현재 y좌표 기록
+        current_position_x = self.odom.get_position_x() #현재 x좌표 기록
+        current_position_y = self.odom.get_position_y()#현재 y좌표 기록
 
         if (self.current_degree == 0): # 앞으로 이동
             while int(self.position_x * 100) >= int((current_position_x + (0.1 * dis)) * 100):
@@ -164,7 +144,7 @@ class Turtlebot_move:
         while not rospy.is_shutdown():
             self.command.angular.z = self.kp * (target_rad - self.yaw)  # 현재 각도에 따라 회전 속도를 조절
             self.pub.publish(self.command)
-            self.r.sleep()
+            self.r.sleeOp()
             if (int(self.command.angular.z * 100) == 0):
                 break
 
@@ -191,3 +171,7 @@ class Turtlebot_move:
 
 Turtlebot_move()
 
+if __name__ == '__main__':
+    move = Turtlebot_move()
+    while rospy.is_shutdown():
+        move
