@@ -3,10 +3,7 @@
 
 import rospy
 import time
-import math
-import Lidar
 from move import Turtlebot_move
-import mqtt_subscribe
 
 
 if __name__ == '__main__':
@@ -21,7 +18,6 @@ if __name__ == '__main__':
         order = move.recive_order.split("/")  # "/" 기준으로 명령을 분리
         move.start(order)  # 터틀봇 이동 시작
 
-        currnet_time = time.time()
         # 경로 이동후 OTP확인
         if (move.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
             move.mqtt_sub.otp_start()  # 인증 요구후 실패 성공 상관 없이 원래 경로로 복귀
