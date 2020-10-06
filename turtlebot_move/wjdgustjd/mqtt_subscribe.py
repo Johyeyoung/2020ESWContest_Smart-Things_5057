@@ -27,8 +27,6 @@ class Turtlebot_move:
         self.command = Twist()
         rospy.sleep(2)
 
-        rospy.spin()
-
     # 서버로부터 터틀봇의 움직임을 받음
     def callback_server(self, msg):
         self.recive_order = msg.data  # 서버 msg의 data

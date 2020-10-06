@@ -100,10 +100,10 @@ class Turtlebot_move:
     # 터틀봇 기본 동작
 
     def move_go(self, dis):
-        current_position_x = self.position_x
-        current_position_y = self.position_y
+        current_position_x = self.position_x #현재 x좌표 기록
+        current_position_y = self.position_y #현재 y좌표 기록
 
-        if (self.current_degree == 0):
+        if (self.current_degree == 0): # 앞으로 이동
             while int(self.position_x * 100) >= int((current_position_x + (0.1 * dis)) * 100):
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
@@ -111,7 +111,7 @@ class Turtlebot_move:
                 self.move(0.01, 0)
 
 
-        elif (self.current_degree == -90):
+        elif (self.current_degree == -90): # 오른쪽으로 이동앞
             while int(self.position_y * 100) <= int((current_position_y - (0.1 * dis)) * 100):
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
@@ -119,14 +119,14 @@ class Turtlebot_move:
                 self.move(0.01, 0)
 
 
-        elif (self.current_degree == 90):
+        elif (self.current_degree == 90): # 왼쪽으로 이동
             while int(self.position_y * 100) >= int((current_position_y + (0.1 * dis)) * 100):
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
                     break
                 self.move(0.01, 0)
 
-        elif (self.current_degree == 180):
+        elif (self.current_degree == 180): #뒷쪽으로 이동
             while int(self.position_x * 100) <= int((current_position_x - (0.1 * dis)) * 100):
                 if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
                     self.mqtt_sub.otp_start()
@@ -140,7 +140,7 @@ class Turtlebot_move:
         self.move_turn(target_rad)  # 터틀봇 회전
         self.move_go(dis)
 
-    def move_back(self, dis):  # 180 방향으로 회전ㄴ
+    def move_back(self, dis):  # 180 방향으로 회전
         self.current_degree = 180
         target_rad = self.current_degree * math.pi / 180  # target 방향 설정
         self.move_turn(target_rad)  # 터틀봇 회전

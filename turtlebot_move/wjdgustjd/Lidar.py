@@ -12,7 +12,7 @@ class Lds:
         self.right = 0
         self.left = 0
         self.front = 0
-        rospy.spin()
+
 
     # Lider값 가공
     def callback_lidar(self, scan):
