@@ -63,7 +63,7 @@ class Detect_Obj_yolo:
 					# box followed by the boxes' width and height
 					box = detection[0:4] * np.array([W, H, W, H])
 					(centerX, centerY, width, height) = box.astype("int")
-
+					
 					# use the center (x, y)-coordinates to derive the top and
 					# and left corner of the bounding box
 					x = int(centerX - (width / 2))
