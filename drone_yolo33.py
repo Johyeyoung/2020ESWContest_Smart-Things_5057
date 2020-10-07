@@ -68,7 +68,7 @@ class Detect_Obj_yolo:
 					# and left corner of the bounding box
 					x = int(centerX - (width / 2))
 					y = int(centerY - (height / 2))
-
+					
 					# update our list of bounding box coordinates, confidences,
 					# and class IDs
 					boxes.append([x, y, int(width), int(height)])
