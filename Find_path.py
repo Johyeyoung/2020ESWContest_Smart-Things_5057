@@ -7,7 +7,7 @@ class Find_path:
         # 1... map 생성자 객체 생성
         self.makeMap = Realize(img)
         # 2... map의 왜곡없애기
-        self.makeMap.contour()
+        self.makeMap.get_Max_contour()
         self.makeMap.delete_destroy()
         # 4... 침입자의 위치 알아내기
         self.target_x, self.target_y = round(location[0]/10), round(location[1] / 10)  # 밀입자의 좌표
@@ -95,7 +95,7 @@ class Find_path:
 if __name__ =='__main__':
     img = cv2.imread('./container/origin.jpg')
     makeMap = Realize(img)
-    makeMap.contour()
+    makeMap.get_Max_contour()
     makeMap.delete_destroy()
     map = makeMap.draw_result_map()
     realize = Find_path(img, [80, 90], map)  # 인덱스 1부터 0부터 세지 말기
