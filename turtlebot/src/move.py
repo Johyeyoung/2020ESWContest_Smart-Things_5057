@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import rospy
-
-import time
+import rospy, time, math
 from geometry_msgs.msg import Twist
-import math
 from Lidar import *
-from mqtt_serve import *
+from mqtt_communicate import *
 from odometry import Odom
 
 
@@ -17,7 +14,7 @@ class Turtlebot_move:
         self.kp = 0.5  # 터틀봇의 회전 속도
 
         rospy.init_node('turtle_move')
-        self.mqtt_sub = MQTT_serve()
+        self.mqtt = MQTT_communicate()
         self.lidar = Lds()
         self.odom = Odom()
         self.pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)  # 모터 회전 관련 publisher
@@ -62,8 +59,8 @@ class Turtlebot_move:
                 if (int(self.odom.get_position_x() * 100) >= int((current_position_x + 0.1 * dis) * 100)):
                     self.move_stop()
                     break
-                if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
-                    self.mqtt_sub.otp_start()
+                if (self.mqtt.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
+                    self.mqtt.otp_start()
                     break
 
         elif (self.current_degree == -90):
@@ -72,8 +69,8 @@ class Turtlebot_move:
                 if (int(self.odom.get_position_y() * 100) <= int((current_position_y - 0.1 * dis) * 100)):
                     self.move_stop()
                     break
-                if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
-                    self.mqtt_sub.otp_start()
+                if (self.mqtt.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
+                    self.mqtt.otp_start()
                     break
 
         elif (self.current_degree == 90):
@@ -82,8 +79,8 @@ class Turtlebot_move:
                 if (int(self.odom.get_position_y() * 100) >= int((current_position_y + 0.1 * dis) * 100)):
                     self.move_stop()
                     break
-                if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
-                    self.mqtt_sub.otp_start()
+                if (self.mqtt.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
+                    self.mqtt.otp_start()
                     break
 
         elif (self.current_degree == 180):
@@ -92,8 +89,8 @@ class Turtlebot_move:
                 if (int(self.odom.get_position_x() * 100) <= int((current_position_x - 0.1 * dis) * 100)):
                     self.move_stop()
                     break
-                if (self.mqtt_sub.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
-                    self.mqtt_sub.otp_start()
+                if (self.mqtt.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
+                    self.mqtt.otp_start()
                     break
 
         self.move(0, 0)
