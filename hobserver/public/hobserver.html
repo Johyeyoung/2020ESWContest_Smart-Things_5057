@@ -9,30 +9,29 @@
     <script src="/event"></script>
   </head>
   <body>
-    <h1>항만 모니터링</h1>
-    <hr>
-        <h3><li>OTP 인증</li></h3>
-        <!-- <ul class="standby_otp"></ul> -->
-        <ul class="otpInfo"></ul>
+    <h1>항만 모니터링 </h1>
+    <h3 style="margin-top: -40px;">  - OTP 인증</h3>
+      <ul class="otpInfo" style="margin-top:-10px;"></ul>
         <hr>
     <div class = "middle">
        <div class="middle-left">
-        <h3>드론 이미지</h3> 
-        <div class="map_origin"></div>
-       </div>
-       <div class="middle-middle">
-        <h3>최종 맵</h3> 
-        <div class="map_result"></div>
+        <h3 > <터틀봇 웹 캠> </h3><br>
+        <img style="-webkit-user-select: none;margin: auto; margin-top: -30px;"
+        src="http://192.168.0.32:8080/stream?topic=/usb_cam/image_raw"
+         width="400" height="300"/></div>
+       <div class="middle-right">
+        <h3 ><드론 이미지></h3> <div class="map_origin"></div>
       </div>
-        <div class="middle-right">
-          <h3>터틀봇 웹 캠</h3>
-            <img style="-webkit-user-select: none;margin: auto;"src="http://192.168.0.32:8080/stream?topic=/image_view/output"
-             width="480" height="360">
-        </div>
-        <div class="middle-right-side">
-          <h3>침입자 이미지</h3>
-          <div class="intruder"></div>
+      </div>
+    </div>
+    <div class="bottom">
+        <div class="bottom-left">
+          <h3><최종 맵></h3><div class="map_result"></div>
+       </div>
+        <div class="bottom-right">
+          <h3><침입자 이미지></h3><div class="intruder"></div>
        </div>
     </div>
+  </div>
   </body>
 </html>

@@ -20,27 +20,29 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-// app.use('/', indexRouter);
 app.get('/', function(req, res){
-  res.sendFile(__dirname+'/public/hobserver.html');
+  res.sendFile(__dirname + '/public/hobserver.html');
 });
 app.use('/users', usersRouter);
 app.use('/', mainRouter);
 app.use('/event', express.static('./public/javascripts/event.js'));
 
 app.io = require('socket.io')();
-// socket.io 의 이벤트 등록 및 위의 socket.io 라이브러리르 socketIoHandler에게 전달
 
+// mongoDB 객체를 생성하고 연결
 var mongoDB = require('mongodb').MongoClient;
 var url = 'mongodb://127.0.0.1:27017';
 var dbObj = null;
 mongoDB.connect(url, { useUnifiedTopology: true }, function(err, db){
   dbObj = db.db('Hobserver');
   console.log("hobserver db connect~");
-  var socketIoImage1 = require('./modules/socketIoImage.js')(app.io, 'map_origin_evt',dbObj,'map_origin.jpg');
+  // 'map_origin_evt' 이벤트 등록 - map_origin.jpg 이미지 
+  var socketIoImage1 = require('./modules/socketIoImage.js')(app.io, 'map_origin_evt', dbObj,'map_origin.jpg');
+  // 'map_result_evt' 이벤트 등록 - map_result.jpg 이미지
   var socketIoImage2 = require('./modules/socketIoImage.js')(app.io, 'map_result_evt', dbObj,'map_result.jpg');
+  // 'intruder_evt' 이벤트 등록 - intruder.jpg 이미지
   var socketIoImage3 = require('./modules/socketIoImage.js')(app.io, 'intruder_evt', dbObj,'intruder.jpg');
+  // OTP 이벤트 등록
   var socketIoOTP = require('./modules/socketIoOTP.js')(app.io, dbObj, 'otp_state_evt');
 });
 

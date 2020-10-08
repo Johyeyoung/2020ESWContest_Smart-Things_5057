@@ -1,38 +1,18 @@
-#turtlebot_streaming_button{
-  border-top-left-radius:15px;
-  border-bottom-left-radius:15px;
-  border-top-right-radius: 15px;
-  border-bottom-right-radius: 15px;
-}
-#button_group button{
-  border:3px solid white;
-  background-color:rgba(1,1,1,1);
-  color:white;
-  padding:20px;
-  font-size:20px;
-  font-weight: 800;
-}
-#temp_button{
-  border-top-left-radius:15px;
-  border-bottom-left-radius:15px;
-  border-top-right-radius: 15px;
-  border-bottom-right-radius: 15px;
-}
-#button_group button:hover{
-  color:black;
-  background-color:white;
+h3{
+  margin-top:-10px;
 }
 body{
   font-size:25px;
-  padding-left: 20px;
+  /* padding-left: 20px; */
   font-family: 'italic';
   font-weight: 00;
+  margin-top:-40px;
 }
 div.middle{
   /* outline: 1px solid #9F9F9F; */
-  margin-top: 10px;
-  width: 1800px;
-  height: 800px;
+  /* margin-top: 10px; */
+  width: 900px;
+  height: 380px;
   position: relative;
 }
 div.middle-left{
@@ -42,31 +22,37 @@ div.middle-left{
   left:0px;
   /* padding-left:20px; */
   width: 400px;
-  height: 500px;
-}
-div.middle-middle{
-  /* outline: 1px solid #9F9F9F; */
-  position: absolute;
-  top: 0px;
-  left:420px;
-  width:350px;
-  height: 500px;
+  height: 380px;
 }
 div.middle-right{
   /* outline: 1px solid #9F9F9F; */
   position: absolute;
   top: 0px;
-  left: 780px;
-  width: 500px;
-  height: 500px;
+  padding-left:30px;
+  left:400px;
+  width:400px;
+  height: 380px;
 }
-div.middle-right-side{
+div.bottom{
+  /* outline: 1px solid #9F9F9F; */
+  position: relative;
+  width: 800px;
+  height: 380px;
+}
+div.bottom-left{
   /* outline: 1px solid #9F9F9F; */
   position: absolute;
-  top: 0px;
-  left: 1280px;
+  left: 0px;
   width: 400px;
-  height: 500px;
+  height:380px;
+}
+div.bottom-right{
+  /* outline: 1px solid #9F9F9F; */
+  position: absolute;
+  padding-left:30px;
+  left:400px;
+  width:400px;
+  height: 380px;
 }
 .success{
   font-weight:bold;
@@ -77,26 +63,27 @@ div.middle-right-side{
   -moz-animation:blink 1.5s ease-in-out infinite alternate;
   animation:blink 1.5s ease-in-out infinite alternate;
   font-weight: bold ;
+  margin-top:-30px;
 }
 @-webkit-keyframes blink{
-  0% {opacity:0; color: red;}
-  49%{	color: red;	}
-  50%{	color: transparent;	}
-  99%{	color: red;	}
-  100% {opacity:1; color: red ;}
+  0% {opacity:0; }
+
+  /* 50%{	color: transparent;	} */
+
+  100% {opacity:1; }
 }
 @-moz-keyframes blink{
-  0% {opacity:0; color: red;}
-  49%{	color: red;	}
-  50%{	color: transparent;	}
-  99%{	color: red;	}
-  100% {opacity:1; color: red ;}
+  0% {opacity:0; }
+  
+  /* 50%{	color: transparent;	} */
+ 
+  100% {opacity:1;}
 }
 @keyframes blink{
-  0% {opacity:0; color:red;}
-  49%{	color: red;	}
+  0% {opacity:0; }
+/*   
   50%{	color: transparent;	}
-  99%{	color: red;	}
-  100% {opacity:1; color: red ;}
+   */
+  100% {opacity:1;}
 }
 
