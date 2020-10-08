@@ -6,7 +6,7 @@ import math
 class Find_path:
     def __init__(self, img, location=None, map=None):
         # 1... map 생성자 객체 생성
-        self.makeMap = Realize(img)
+        self.makeMap = Make_Map(img)
         # 2... map의 왜곡없애기
         self.makeMap.get_Max_contour()
         self.makeMap.delete_destroy()
@@ -96,13 +96,13 @@ class Find_path:
             return img, self.arrows
 
         else:
-            print("주어진 경로가 없습니다")
+            print("          주어진 경로가 없습니다")
 
 
 
 if __name__ =='__main__':
     img = cv2.imread('./container/origin.jpg')
-    makeMap = Realize(img)
+    makeMap = Make_Map(img)
     makeMap.get_Max_contour()
     makeMap.delete_destroy()
     map = makeMap.draw_result_map()
