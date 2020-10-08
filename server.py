@@ -68,7 +68,7 @@ while True:
     # 맵을 먼저 만든다
     if map_flag:
         time.sleep(2)
-        makeMap = Realize(decimg)
+        makeMap = Make_Map(decimg)
         makeMap.contour()
         makeMap.delete_destroy()
         map = makeMap.draw_result_map()
