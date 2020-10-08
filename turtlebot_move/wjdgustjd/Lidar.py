@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import rospy
-from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import LaserScan
 import math
 
@@ -12,7 +11,6 @@ class Lds:
         self.right = 0
         self.left = 0
         self.front = 0
-        rospy.spin()
 
     # Lider값 가공
     def callback_lidar(self, scan):

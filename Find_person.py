@@ -74,10 +74,10 @@ def isPerson(img):
                         0.5, color, 2)
 
     # show the output image
-    cv2.imshow("output", cv2.resize(img, (800, 600)))
+    #cv2.imshow("output", cv2.resize(img, (800, 600)))
     #writer.write(cv2.resize(img, (800, 600)))
-    cv2.waitKey(1) & 0xFF
-    return True if len(boxes) != 0 else len(boxes) == 0
+    #cv2.waitKey(1) & 0xFF
+    return True if len(idxs) != 0 else False
 
 
 
@@ -99,14 +99,14 @@ class MQTT_Subscriber:
 
     # self.topic 구독하기
     def on_connect(self, client, userdata, flags, rc):
-        print("connected with result code" + str(rc))
+        print("# 터틀봇의 응답을 기다립니다." + str(rc))
         client.subscribe(self.topic)
 
     # 메세지 대기 모드
     def on_message(self, client, userdata, msg):
         input_data = msg.payload.decode()
-        self.result_msg = "Success" if input_data == "1" else "Fail"
-        self.result_msg = "Time_Over" if input_data == "3" else "Fail"
+        answer_lst = {"1":"Success", "0":"Fail", "3":"Time_Over"}
+        self.result_msg = answer_lst[input_data]
         if input_data == "0":
             self.limit += 1
             if self.limit == 5:
@@ -117,51 +117,50 @@ class MQTT_Subscriber:
 
 
 def check_person():
-    print('find_person mode')
+    try:
+        print('find_person mode')
+        otp_client = MQTT_Subscriber("otp_result")
+        # 사람을 확인했는지 확인하는 변수
+        flag = 0
+        # 터틀봇 영상 가져오기
+        cap = cv2.VideoCapture('http://192.168.0.32:8080/stream?topic=/usb_cam/image_raw')
+        while True:
+            ret, frame = cap.read()
+            # 디버깅용
+            #cv2.imshow("origin", frame)
+            #if cv2.waitKey(1) & 0xFF == ord('q'):
+            #    break
+            # 1..... yolo로 사람이 발견되면 otp 인증을 한다.
+            if isPerson(frame) and flag == 0:
+                flag = 1
+                print("Find person -----> OTP ON")
+                # .... TurtleBot 에게 경로 정보 넘기기
+                import paho.mqtt.client as mqtt
+                mqtt = mqtt.Client("OTP")  # MQTT client 생성, 이름 ""
+                mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
+                mqtt.publish("otp_start", json.dumps({"data": "start"}))  # topic 과 넘겨줄 값
 
-    # 사람을 확인했는지 확인하는 변수
-    person_ditection = False
-
-    # 터틀봇 영상 가져오기
-    cap = cv2.VideoCapture('http://192.168.0.32:8080/stream?topic=/usb_cam/image_raw')
-    while True:
-        ret, frame = cap.read()
-        # 디버깅용
-        # frame = cv2.imread("./container/66.jpg")
-        cv2.imshow("origin", frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-        isPerson(frame)
-        # 1..... yolo로 사람이 발견되면 otp 인증을 한다.
-        if person_ditection == isPerson(frame):
-            print("Find person -----> OTP ON")
-            # .... TurtleBot 에게 경로 정보 넘기기
-            import paho.mqtt.client as mqtt
-            mqtt = mqtt.Client("OTP")  # MQTT client 생성, 이름 ""
-            mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
-            mqtt.publish("otp_start", json.dumps({"data": "start"}))  # topic 과 넘겨줄 값
-
-            # 2..... OTP 인증 Mode start!!
-            otp_client = MQTT_Subscriber("otp")
-            while True:
-                # 2-0..... OTP(MQTT) 메세지 분석
-                otp_result = otp_client.result_msg
-                if otp_result == "Success":
-                    print("인증 성공!")
-                    return True
-                if otp_result == "Time_Over":
-                    print("시간초과!!")
-                    return False  # 다시 드론으로부터 이미지 받아서 추적
-                if otp_client.limit == 5:
-                    # 2-1.... 인증시도 5회 만료시, 현장 사진 mongoDB 저장
-                    print("관리자 확인 요망!")
-                    cv2.imwrite('./otpChecker/intruder.jpg', frame)
-                    img = open('./otpChecker/intruder.jpg', 'rb')
-                    mongo.storeImg_otp(img, 'intruder.jpg')  # 넘길 이미지와 이름
-                    return False # 다시 드론으로부터 이미지 받아서 추적
-
+                # 2..... OTP 인증 Mode start!!
+            # 2-0..... OTP(MQTT) 메세지 분석
+            otp_result = otp_client.result_msg
+            if otp_result == "Success":
+                print("인증 성공!")
+                return True
+            elif otp_result == "Time_Over":
+                print("시간초과!!")
+                return False  # 다시 드론으로부터 이미지 받아서 추적
+            if otp_client.limit == 5:
+                # 2-1.... 인증시도 5회 만료시, 현장 사진 mongoDB 저장
+                print("관리자 확인 요망!")
+                cv2.imwrite('./otpChecker/intruder.jpg', frame)
+                img = open('./otpChecker/intruder.jpg', 'rb')
+                mongo.storeImg_otp(img, 'intruder.jpg')  # 넘길 이미지와 이름
+                return False # 다시 드론으로부터 이미지 받아서 추적
+    except:
+        pass
 
 
 if __name__ =='__main__':
-    mqtt_Subscriber = MQTT_Subscriber()
+    mqtt_Subscriber = MQTT_Subscriber("otp_result")
     # 사람을 찾는 main 함수
+    check_person()

@@ -26,12 +26,13 @@ def recvall(sock, count):
 # .......... 0-2. mongoDB 객체 생성
 mongo = MongoDB()
 
+
+# .......... 1. TCP 소켓 열고 수신 대기
 # .......... 0-1. 서버의 IP와 port 번호
 # .......... 4-2. TurtleBot 에게 MQTT 로 경로 정보 넘기기
 mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
 mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
 
-# .......... 1. TCP 소켓 열고 수신 대기
 TCP_IP = '192.168.0.15'
 TCP_PORT = int(sys.argv[1])
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -90,6 +91,8 @@ while True:
         find_path.path_algorithm(postLocation)
         postLocation = location
         img, pos = find_path.real_path()
+        time.sleep(3)
+
         mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
 
 
@@ -114,3 +117,4 @@ while True:
         # 다시 추적을 위해 드론소켓으로 작동하라는 명령을 내린다
         conn.send('DRONE_again'.encode('utf-8'))
         print('DRone_again')
+        time.sleep(3)
