@@ -6,7 +6,7 @@ import math
 class Find_path:
     def __init__(self, img, location=None, map=None):
         # 1... map 생성자 객체 생성
-        self.makeMap = Realize(img)
+        self.makeMap = Make_Map(img)
         # 2... map의 왜곡없애기
         self.makeMap.get_Max_contour()
         self.makeMap.delete_destroy()
@@ -19,22 +19,18 @@ class Find_path:
         self.check_map = [[0 for i in range(len(self.map[0]))] for row in range(len(self.map[0]))]
         self.arrows = ''
 
-        # mongoDB 객체 생성
-        self.mongo = MongoDB()
 
 
     # 최적의 경로를 찾는다
     def path_algorithm(self, postLocation):
-
-
         # ........ Turtlebot 의 시작 위치
         start_x, start_y = math.ceil(postLocation[0]/10), math.ceil(postLocation[1]/10)
 
         # ....... 위치 데이터 : index = 1(목적지), index = 0(시작점)  : print문은 => index 1부터
-        print("------------------------------------------")
-        print("침입자의 위치: (x, y) = ({}, {}) | 좌표값 = {}".format(self.target_x, self.target_y, self.map[self.target_y - 1][self.target_x - 1]))
-        print("터틀봇의 위치: (x, y) = ({}, {}) | 좌표값 = {}".format(start_x+1, start_y+1, self.map[start_y][start_x])) #
-        print("------------------------------------------")
+        print("---------------------------------------------------------------")
+        print("          침입자의 위치: (x, y) = ({}, {}) | 좌표값 = {}".format(self.target_x, self.target_y, self.map[self.target_y - 1][self.target_x - 1]))
+        print("          터틀봇의 위치: (x, y) = ({}, {}) | 좌표값 = {}".format(start_x+1, start_y+1, self.map[start_y][start_x])) #
+        print("---------------------------------------------------------------")
 
         # ....... 경로 algorithm 시작
         dot_name = {(0, 1): "L",  (1, 0): "G", (0, -1): "R", (-1, 0): "B"}  # (y, x)
@@ -48,7 +44,7 @@ class Find_path:
 
             if x == self.target_x - 1 and y == self.target_y - 1:
                 # 최종 경로 도착
-                print("".join(direction))  # LLLRRRGGG
+                print("          원본 경로: ", "".join(direction))  # LLLRRRGGG
                 self.arrows = "".join(direction)
                 self.arrows = self.path_MQTT(self.arrows)  # 주어진 형식대로 MQTT 메세지 데이터 정리
                 break
@@ -71,7 +67,9 @@ class Find_path:
             # LLLLRRRRR -> L40R50
             result = [a[0]+str(len(a)*10) for a in pathData.split('/')]
             pathData = '/'.join(result)
-            print(pathData)
+            print("          최종 경로: ", pathData)
+            print("-------------------------------------------------------------------")
+
             return pathData
 
 
@@ -98,13 +96,13 @@ class Find_path:
             return img, self.arrows
 
         else:
-            print("주어진 경로가 없습니다")
+            print("          주어진 경로가 없습니다")
 
 
 
 if __name__ =='__main__':
     img = cv2.imread('./container/origin.jpg')
-    makeMap = Realize(img)
+    makeMap = Make_Map(img)
     makeMap.get_Max_contour()
     makeMap.delete_destroy()
     map = makeMap.draw_result_map()

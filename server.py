@@ -37,9 +37,9 @@ TCP_PORT = int(sys.argv[1])
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((TCP_IP, TCP_PORT))
 s.listen(True)
-print("#####################################")
-print("######### SERVER is waiting #########")
-print("#####################################")
+print("#####################################################################")
+print("######################## SERVER is waiting ##########################")
+print("#####################################################################")
 
 conn, addr = s.accept()
 postLocation = [0, 0]
@@ -58,7 +58,7 @@ while True:
     #........ 이미지 데이터
     data = numpy.fromstring(stringData, dtype='uint8')
     decimg = cv2.imdecode(data, 1)
-    print("_________ SERVER get Data _________")
+    print("______________________  SERVER GET DATA  ______________________\n\n")
 
     # .......... 2-1. debugging 이미지 확인하기
     #cv2.imshow('SERVER', decimg)
@@ -67,7 +67,8 @@ while True:
 
     # 맵을 먼저 만든다
     if map_flag:
-        makeMap = Realize(decimg)
+        time.sleep(2)
+        makeMap = Make_Map(decimg)
         makeMap.contour()
         makeMap.delete_destroy()
         map = makeMap.draw_result_map()
@@ -76,11 +77,14 @@ while True:
 
     # .......... 3. 이미지(origin.jpg)를 mongoDB에 저장
     mongo.storeImg_map(decimg, 'map_origin.jpg')
-    print("____________Drone image saved!!____________")
-
+    print("                       DRONE image saved!!")
 
     # .......... 4. 길찾기 시작
-    print("____________경로 탐색 모드가 실행됩니다._____________")
+    print("__________________  경로 탐색 모드가 실행됩니다. ___________________")
+    print("                           ▼")
+    print("                           ▼")
+    print("                           ▼\n\n")
+    time.sleep(2)
     if location[0]//10 != postLocation[0]//10 and location[1]//10 != postLocation[1]//10:
         find_path = Find_path(decimg, location, map)
         find_path.path_algorithm(postLocation)
@@ -91,20 +95,35 @@ while True:
 
         # .......... 4-1. 경로 맵(map_result.jpg)을 mongoDB에 저장하기
         mongo.storeImg_map(img, 'map_result.jpg')
-        print("____________map_result image saved!!____________")
+        print("_______________ map_result image saved!! _______________")
+
 
     else:
-        print("이미 경로를 탐색했습니다")
+        print("_________________________________________________________")
+        print("           이미 탐색한 경로입니다. 감시를 종료합니다.           ")
+        print("_________________________________________________________")
+
         break
 
     # .......... 6. Read Turtlebot wabCam and find person
-    print("____________객체 추적 모드가 실행됩니다._____________")
-    result = Find_person.check_person()
+    time.sleep(2)
+    print("________________ 터틀봇이 주행을 시작합니다. ________________")
+    print("                           ▼")
+    print("                           ▼")
+    print("                           ▼\n\n")
+
+    find_person = Find_person()
+    result = find_person.check_person()
     if result == True:
         conn.send('DRONE_close'.encode('utf-8'))
-        print('DRone_close')
+        print("_________________________________________________________")
+        print('                 DRONE 감시 모드를 종료합니다.')
+        print("_________________________________________________________\n")
+
         break
     else:
         # 다시 추적을 위해 드론소켓으로 작동하라는 명령을 내린다
         conn.send('DRONE_again'.encode('utf-8'))
-        print('DRone_again')
+        print("_________________________________________________________")
+        print('                   DRONE 이미지를 요청합니다.')
+        print("_________________________________________________________\n")
