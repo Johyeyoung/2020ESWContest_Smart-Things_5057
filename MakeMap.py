@@ -40,6 +40,7 @@ class Realize:
 
 
 
+
     ################## 휘어진 사진 보정하기 1 ##########################
     def order_point(self, contour):  # 등고선 라인이 주어지면 -> 꼭짓점을 찾는다
         rect = np.zeros((4, 2), dtype="float32")
@@ -54,8 +55,7 @@ class Realize:
         diff = np.diff(contour, axis=1)
         rect[1] = contour[np.argmin(diff)]  # y - x 값이 가장 작으면: RightTop
         rect[3] = contour[np.argmax(diff)]  # y - x 값이 가장 크면: leftBottom
-        print(
-            "LeftTop: {}, LeftBottom: {}, RightTop: {}, RightBottom: {}".format(rect[0], rect[3], rect[1], rect[2]))
+        #print("LeftTop: {}, LeftBottom: {}, RightTop: {}, RightBottom: {}".format(rect[0], rect[3], rect[1], rect[2]))
         return rect
 
     ################## 휘어진 사진 보정하기 2 ##########################
@@ -74,7 +74,9 @@ class Realize:
         dst = np.float32([[0, 0], [maxWidth-1, 0], [maxWidth-1, maxHeight-1], [0, maxHeight-1]])
         M = cv2.getPerspectiveTransform(rect, dst)
         self.img_result = cv2.warpPerspective(self.img, M, (maxWidth, maxHeight))
-
+        cv2.imshow("img_result1", self.img_result)
+        cv2.imshow("img_result0", self.img)
+        cv2.waitKey(0)
 
 
     ########## 밀반입자의 위치를 반환################
@@ -104,8 +106,7 @@ class Realize:
             print(target_cndt)
             x, y = target_cndt[0][1], target_cndt[0][2]
             cv2.line(self.img_result2, (x, y), (x, y), (0, 225, 225), 2)
-        #cv2.imshow("img_result", self.img_result2)
-        #cv2.waitKey(0)
+
 
         print("target:", round(y/10), round(x/10))
         return round(x/10), round(y/10)
@@ -221,7 +222,7 @@ class Realize:
             cv2.line(self.img_result, (x, 0), (x, self.img_result.shape[0]), (0, 225, 225), 2)
         for y in y_dot:
             cv2.line(self.img_result, (0, y), (self.img_result.shape[1], y), (0, 225, 225), 2)
-        ###################################
+        ########### 앞서 구한 픽셀 값을 이용해 GrayScale의 값이 일정 수준이 이상은 컨테이너 영역으로
         imm = cv2.cvtColor(self.img_result, cv2.COLOR_BGR2GRAY)
         for i in range(len(y_dot)):
             for j in range(len(x_dot)):
@@ -234,7 +235,6 @@ class Realize:
                     if 90 <= imm[cY, cX] <= 255:
                         # 보드판은 검정 사각형으로 그림그리기
                         cv2.rectangle(self.img_result, (x_dot[j], y_dot[i]), (x_dot[j+1], y_dot[i+1]), (0, 0, 0), -1)
-                        #print("보드판:", imm[cY, cX])
 
 
 
@@ -252,8 +252,8 @@ class Realize:
 
         # 자른 이미지들 저장 경로 및 저장
         cv2.imwrite('./container/map.jpg', self.img_result)
-        #cv2.imshow("result_2", self.img_result)
-        #cv2.waitKey(0)
+        cv2.imshow("result_2", self.img_result)
+        cv2.waitKey(0)
 
         # 맵의 오차범위를 줄이기 위해 터틀봇이 이동할 수 있는 칸의 크기로 0.1배수 줄여준다
         self.img_result = cv2.resize(self.img_result, None, fx=0.1, fy=0.1, interpolation=cv2.INTER_AREA)
