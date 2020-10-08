@@ -26,20 +26,12 @@ def recvall(sock, count):
 # .......... 0-2. mongoDB 객체 생성
 mongo = MongoDB()
 
-<<<<<<< HEAD
-
-# .......... 1. TCP 소켓 열고 수신 대기
-=======
->>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
 # .......... 0-1. 서버의 IP와 port 번호
 # .......... 4-2. TurtleBot 에게 MQTT 로 경로 정보 넘기기
 mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
 mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
 
-<<<<<<< HEAD
-=======
 # .......... 1. TCP 소켓 열고 수신 대기
->>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
 TCP_IP = '192.168.0.15'
 TCP_PORT = int(sys.argv[1])
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -53,25 +45,18 @@ conn, addr = s.accept()
 postLocation = [0, 0]
 map_flag = True # 전체 구역과 관련해 미리 맵을 만든다
 map = None
-<<<<<<< HEAD
 
 
 
-=======
-
-
-
->>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
 while True:
-    # .......... 2. Client 접속 성공 & data 받기
+    # .......... 2. DRONE Client 접속 성공 & data 받기
     length = recvall(conn, 16)
     stringData = recvall(conn, int(length))
-    location = stringData.split(b'\n\b\n\b')[-1].decode()  # x{}:y{}
+    # ....... 발견된 객체의 위치 x{}:y{} 도출
+    location = stringData.split(b'\n\b\n\b')[-1].decode()
     location = [int(i) for i in location.split(":")]
-    print("터틀봇의 위치: ", postLocation)
-    print("침입자의 위치: ", location)
+    #........ 이미지 데이터
     data = numpy.fromstring(stringData, dtype='uint8')
-    #s.close()
     decimg = cv2.imdecode(data, 1)
     print("_________ SERVER get Data _________")
 
@@ -90,31 +75,21 @@ while True:
 
 
     # .......... 3. 이미지(origin.jpg)를 mongoDB에 저장
-    cv2.imwrite('./container/origin.jpg', decimg)
-    img = open('./container/origin.jpg', 'rb')
-    mongo.storeImg_map(img, 'map_origin.jpg')
+    mongo.storeImg_map(decimg, 'map_origin.jpg')
     print("____________Drone image saved!!____________")
 
 
     # .......... 4. 길찾기 시작
     print("____________경로 탐색 모드가 실행됩니다._____________")
-
     if location[0]//10 != postLocation[0]//10 and location[1]//10 != postLocation[1]//10:
         find_path = Find_path(decimg, location, map)
         find_path.path_algorithm(postLocation)
-        postLocation = location
-        img, pos = find_path.real_path()
-<<<<<<< HEAD
-        time.sleep(3)
-
-=======
->>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
-        mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
+        postLocation = location  # 과거의 목적지는 터틀봇의  다음 시작점이 되기에 기록
+        img, path_data = find_path.drawing_path()  # 경로가 그려진 맵과 경로 데이터 반환
+        mqtt.publish("pathList", json.dumps({"data": path_data}))  # topic 과 넘겨줄 값
 
 
         # .......... 4-1. 경로 맵(map_result.jpg)을 mongoDB에 저장하기
-        cv2.imwrite('./container/map_result.jpg', img)
-        img = open('./container/map_result.jpg', 'rb')
         mongo.storeImg_map(img, 'map_result.jpg')
         print("____________map_result image saved!!____________")
 
@@ -133,7 +108,3 @@ while True:
         # 다시 추적을 위해 드론소켓으로 작동하라는 명령을 내린다
         conn.send('DRONE_again'.encode('utf-8'))
         print('DRone_again')
-<<<<<<< HEAD
-        time.sleep(3)
-=======
->>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
