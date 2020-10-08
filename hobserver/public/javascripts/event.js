@@ -1,7 +1,7 @@
 var socket = null;
 var timer = null;
 $(document).ready(function(){
-    socket = io.connect(); // 3000 port 웹 서버와 연결
+    socket = io.connect(); // 3000 port 웹 서버와 연결함
     // nodejs 보낸 데이터를 수신하는 부분
     console.log('map_origin received');
     // 'map_origin_evt' 이벤트 수신 시 html 출력
