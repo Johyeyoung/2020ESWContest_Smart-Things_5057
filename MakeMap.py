@@ -1,15 +1,15 @@
 import cv2
 import numpy as np
 
-class Realize:
+class Make_Map:
     def __init__(self, img=None):
         self.img = img
         self.img = cv2.resize(self.img, dsize=(400, 400), interpolation=cv2.INTER_AREA)
         #self.img = cv2.imread('./container/origin_state.jpg')
 
         # 이미지의 기본 속성 (행, 열, channel 정보)
-        self.row = self.img.shape[0]  # 행 y
-        self.cal = self.img.shape[1]  # 열 x
+        self.img_row = self.img.shape[0]  # 행 y
+        self.img_cal = self.img.shape[1]  # 열 x
 
         self.canny = self.img.copy()
         self.imgray = self.img.copy()
@@ -252,8 +252,8 @@ class Realize:
 
         # 자른 이미지들 저장 경로 및 저장
         cv2.imwrite('./container/map.jpg', self.img_result)
-        cv2.imshow("result_2", self.img_result)
-        cv2.waitKey(0)
+        #cv2.imshow("result_2", self.img_result)
+        #cv2.waitKey(0)
 
         # 맵의 오차범위를 줄이기 위해 터틀봇이 이동할 수 있는 칸의 크기로 0.1배수 줄여준다
         self.img_result = cv2.resize(self.img_result, None, fx=0.1, fy=0.1, interpolation=cv2.INTER_AREA)
@@ -279,7 +279,7 @@ class Realize:
 
 if __name__ =='__main__':
     img = cv2.imread('./container/origin.jpg')
-    realize = Realize(img)
+    realize = Make_Map(img)
     realize.get_Max_contour()
     realize.delete_destroy()
     realize.find_target_location()
