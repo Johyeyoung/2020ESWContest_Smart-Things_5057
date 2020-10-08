@@ -1,5 +1,5 @@
 module.exports = function(io, db, event){
-    // io: 소켓 객체, db: 데이터베이스, event: 이벤트명
+    // io: 소켓 객체, db: 데이터베이스, event: 이벤트 명
     io.on('connection', function(socket){
         // 이벤트 리스너
         socket.on(event, function(data){

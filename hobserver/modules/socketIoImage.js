@@ -1,5 +1,5 @@
 module.exports = function(io, event, db, fileName){ 
-    // io: 소켓 객체, event: 이벤트명
+    // io: 소켓 객체, event: 이벤트 명
     // db: 데이터베이스, fileName: MongoDB에서 가져올 사진 파일 이름
     io.on('connection', function(socket){ // 'connection' 이벤트 등록
         var files_collection = db.collection('images.files');
@@ -15,7 +15,6 @@ module.exports = function(io, event, db, fileName){
                 }else{
                     // Retrieving the chunks from the db
                     chunks_collection.find({files_id:docs[0]._id}).sort({n:1}).toArray(function(err,  chunks){
-                      
                         if(err){ // 에러 메시지 출력
                             console.log('chunks_collection find error : ' + fileName);
                         }
