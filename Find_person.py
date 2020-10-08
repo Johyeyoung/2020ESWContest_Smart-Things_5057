@@ -98,19 +98,19 @@ class MQTT_OTP_Subscriber:
 
     # self.topic 구독하기
     def on_connect(self, client, userdata, flags, rc):
-        print("connected with result code" + str(rc))
+        print("터틀봇의 답변을 기다리고 있습니다 ▼")
         client.subscribe(self.topic)
 
     # 메세지 대기 모드
     def on_message(self, client, userdata, msg):
         input_data = msg.payload.decode()
-        answer_lst = {"1":"Success", "0":"Fail", "3":"Time_Over"}
+        answer_lst = {"1": "Success", "0": "Fail", "3": "Time_Over"}
         self.result_msg = answer_lst[input_data]
         if input_data == "0":
             self.limit += 1
             if self.limit == 5:
                 self.result_msg = "Real Fail"
-        print(self.result_msg)
+        print("Result ▶ ", self.result_msg)
         self.mongo.storeStr_otp(self.result_msg)  # MongoDB에 OTP 결과 저장
 
 
@@ -129,14 +129,14 @@ class Find_person:
 
     def check_person(self):
         try:
-            print('find_person mode')
             while True:
                 ret, frame = self.cap.read()
 
                 # 1..... yolo로 사람이 발견되면 otp 인증을 한다.
                 if self.yolo_checker.isPerson(frame) and self.flag == 0:
                     self.flag = 1
-                    print("Find person -----> OTP ON")
+                    print("                    Find person  --------->  OTP ON                    ")
+                    print("___________________ 사람을 발견했습니다. OTP 인증 시도 ___________________")
                     # 1-0 .... TurtleBot 에게 otp 시작 알림
                     import paho.mqtt.client as mqtt
                     mqtt = mqtt.Client("OTP")  # MQTT client 생성, 이름 ""
@@ -147,15 +147,15 @@ class Find_person:
                 # 2..... OTP 인증 Mode start!! --- (MQTT) 답변 받기 및 메세지 분석
                 otp_result = self.otp_client.result_msg
                 if otp_result == "Success":
-                    print("인증 성공!")
+                    print("▶ OTP 인증 성공 ")
                     return True
                 elif otp_result == "Time_Over":
-                    print("시간초과!!")
+                    print("▶ OTP 시간 초과 ")
                     self.mongo.storeImg_otp(frame, 'intruder.jpg')  # 넘길 이미지와 이름
                     return False  # 다시 드론으로부터 이미지 받아서 추적
                 if self.otp_client.limit == 5:
                     # 2-1.... 인증시도 5회 만료시, 현장 사진 mongoDB 저장
-                    print("관리자 확인 요망!")
+                    print("▶ OTP 관리자 확인 요망 ")
                     self.mongo.storeImg_otp(frame, 'intruder.jpg')  # 넘길 이미지와 이름
                     return False  # 다시 드론으로부터 이미지 받아서 추적
 
