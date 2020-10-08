@@ -4,84 +4,83 @@ import json
 from mongoengine import connect, Document, fields
 import paho.mqtt.client as mqtt
 from MongoDB import *
-mongo = MongoDB()
-
-LABELS_FILE='./yolo/obj.names'
-CONFIG_FILE='./yolo/yolov4-tiny-custom.cfg'
-WEIGHTS_FILE='./yolo/yolo_turtle.weights'
-min_confidence = 0.3
-h, w=None, None
-
-net = cv2.dnn.readNetFromDarknet(CONFIG_FILE, WEIGHTS_FILE)
-layer_names = net.getLayerNames()
-output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-LABELS = open(LABELS_FILE).read().strip().split("\n")
-np.random.seed(4)
-COLORS = np.random.randint(0, 255, size=(len(LABELS), 3), dtype="uint8")
 
 
+class Yolo_checker:
+    def __init__(self):
+        LABELS_FILE = './yolo/obj.names'
+        CONFIG_FILE = './yolo/yolov4-tiny-custom.cfg'
+        WEIGHTS_FILE = './yolo/yolo_turtle.weights'
+        self.min_confidence = 0.3
+        h, w = None, None
 
-# 들어온 화면에서 yolo로 사람인지 확인하기
-def isPerson(img):
-
-    # Loading image
-    height, width, channels = img.shape
-
-    # Detecting objects
-    blob = cv2.dnn.blobFromImage(img, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
-    net.setInput(blob)
-    outs = net.forward(output_layers)  # outs는 감지 결과이다. 탐지된 개체에 대한 모든 정보와 위치를 제공한다.
-
-    # Showing informations on the screen
-    class_ids = []
-    confidences = []
-    boxes = []
-    (h, w) = img.shape[:2]
-    for out in outs:
-        for detection in out:
-            scores = detection[5:]
-            class_id = np.argmax(scores)
-            confidence = scores[class_id]
-            if confidence > min_confidence:
-                # Object detected
-                # center_x = int(detection[0] * width)
-                # center_y = int(detection[1] * height)
-                box = detection[0:4] * np.array([w, h, w, h])
-                (center_x, center_y, width, height) = box.astype("int")
-
-                # Rectangle coordinates
-                x = int(center_x - (width / 2))
-                y = int(center_y - (height / 2))
-                boxes.append([x, y, int(width), int(height)])
-                confidences.append(float(confidence))
-                class_ids.append(class_id)
-
-    idxs = cv2.dnn.NMSBoxes(boxes, confidences, min_confidence,
-                            min_confidence)
-
-    # ensure at least one detection exists
-    if len(idxs) > 0:
-        # loop over the indexes we are keeping
-        for i in idxs.flatten():
-            # extract the bounding box coordinates
-            (x, y) = (boxes[i][0], boxes[i][1])
-            (w, h) = (boxes[i][2], boxes[i][3])
-            color = [int(c) for c in COLORS[class_ids[i]]]
-
-            cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-            text = "{}: {:.4f}".format(LABELS[class_ids[i]], confidences[i])
-            cv2.putText(img, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5, color, 2)
-
-    # show the output image
-    #cv2.imshow("output", cv2.resize(img, (800, 600)))
-    #writer.write(cv2.resize(img, (800, 600)))
-    #cv2.waitKey(1) & 0xFF
-    return True if len(idxs) != 0 else False
+        self.net = cv2.dnn.readNetFromDarknet(CONFIG_FILE, WEIGHTS_FILE)
+        layer_names = self.net.getLayerNames()
+        self.output_layers = [layer_names[i[0] - 1] for i in self.net.getUnconnectedOutLayers()]
+        self.LABELS = open(LABELS_FILE).read().strip().split("\n")
+        np.random.seed(4)
+        self.COLORS = np.random.randint(0, 255, size=(len(self.LABELS), 3), dtype="uint8")
 
 
+    # 들어온 화면에서 yolo로 사람인지 확인하기
+    def isPerson(self, img):
+        # Loading image
+        height, width, channels = img.shape
+        # Detecting objects
+        blob = cv2.dnn.blobFromImage(img, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
+        self.net.setInput(blob)
+        outs = self.net.forward(self.output_layers)  # outs는 감지 결과이다. 탐지된 개체에 대한 모든 정보와 위치를 제공한다.
 
-class MQTT_Subscriber:
+        # Showing informations on the screen
+        class_ids = []
+        confidences = []
+        boxes = []
+        (h, w) = img.shape[:2]
+        for out in outs:
+            for detection in out:
+                scores = detection[5:]
+                class_id = np.argmax(scores)
+                confidence = scores[class_id]
+                if confidence > self.min_confidence:
+                    # Object detected
+                    # center_x = int(detection[0] * width)
+                    # center_y = int(detection[1] * height)
+                    box = detection[0:4] * np.array([w, h, w, h])
+                    (center_x, center_y, width, height) = box.astype("int")
+
+                    # Rectangle coordinates
+                    x = int(center_x - (width / 2))
+                    y = int(center_y - (height / 2))
+                    boxes.append([x, y, int(width), int(height)])
+                    confidences.append(float(confidence))
+                    class_ids.append(class_id)
+
+        idxs = cv2.dnn.NMSBoxes(boxes, confidences, self.min_confidence,
+                                self.min_confidence)
+
+        # ensure at least one detection exists
+        if len(idxs) > 0:
+            # loop over the indexes we are keeping
+            for i in idxs.flatten():
+                # extract the bounding box coordinates
+                (x, y) = (boxes[i][0], boxes[i][1])
+                (w, h) = (boxes[i][2], boxes[i][3])
+                color = [int(c) for c in self.COLORS[class_ids[i]]]
+
+                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+                text = "{}: {:.4f}".format(self.LABELS[class_ids[i]], confidences[i])
+                cv2.putText(img, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                            0.5, color, 2)
+
+        # show the output image
+        #cv2.imshow("output", cv2.resize(img, (800, 600)))
+        #writer.write(cv2.resize(img, (800, 600)))
+        #cv2.waitKey(1) & 0xFF
+        return True if len(idxs) != 0 else False
+
+
+
+class MQTT_OTP_Subscriber:
     def __init__(self, topic):
         self.limit = 0  # 최대 인증 시도 5회까지 check
         self.result_msg = None  # otp 인증 결과
@@ -115,52 +114,60 @@ class MQTT_Subscriber:
         self.mongo.storeStr_otp(self.result_msg)  # MongoDB에 OTP 결과 저장
 
 
+class Find_person:
+    def __init__(self):
+        # 필요한 객체 생성
+        self.otp_client = MQTT_OTP_Subscriber("otp_result")
+        self.yolo_checker = Yolo_checker()
+        self.mongo = MongoDB()
 
-def check_person():
-    try:
-        print('find_person mode')
-        otp_client = MQTT_Subscriber("otp_result")
         # 사람을 확인했는지 확인하는 변수
-        flag = 0
+        self.flag = 0
         # 터틀봇 영상 가져오기
-        cap = cv2.VideoCapture('http://192.168.0.32:8080/stream?topic=/usb_cam/image_raw')
-        while True:
-            ret, frame = cap.read()
-            # 디버깅용
-            #cv2.imshow("origin", frame)
-            #if cv2.waitKey(1) & 0xFF == ord('q'):
-            #    break
-            # 1..... yolo로 사람이 발견되면 otp 인증을 한다.
-            if isPerson(frame) and flag == 0:
-                flag = 1
-                print("Find person -----> OTP ON")
-                # .... TurtleBot 에게 경로 정보 넘기기
-                import paho.mqtt.client as mqtt
-                mqtt = mqtt.Client("OTP")  # MQTT client 생성, 이름 ""
-                mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
-                mqtt.publish("otp_start", json.dumps({"data": "start"}))  # topic 과 넘겨줄 값
+        self.cap = cv2.VideoCapture('http://192.168.0.32:8080/stream?topic=/usb_cam/image_raw')
 
-                # 2..... OTP 인증 Mode start!!
-            # 2-0..... OTP(MQTT) 메세지 분석
-            otp_result = otp_client.result_msg
-            if otp_result == "Success":
-                print("인증 성공!")
-                return True
-            elif otp_result == "Time_Over":
-                print("시간초과!!")
-                return False  # 다시 드론으로부터 이미지 받아서 추적
-            if otp_client.limit == 5:
-                # 2-1.... 인증시도 5회 만료시, 현장 사진 mongoDB 저장
-                print("관리자 확인 요망!")
-                cv2.imwrite('./otpChecker/intruder.jpg', frame)
-                img = open('./otpChecker/intruder.jpg', 'rb')
-                mongo.storeImg_otp(img, 'intruder.jpg')  # 넘길 이미지와 이름
-                return False # 다시 드론으로부터 이미지 받아서 추적
-    except:
-        pass
+
+    def check_person(self):
+        try:
+            print('find_person mode')
+            while True:
+                ret, frame = self.cap.read()
+
+                # 1..... yolo로 사람이 발견되면 otp 인증을 한다.
+                if self.yolo_checker.isPerson(frame) and self.flag == 0:
+                    self.flag = 1
+                    print("Find person -----> OTP ON")
+                    # 1-0 .... TurtleBot 에게 otp 시작 알림
+                    import paho.mqtt.client as mqtt
+                    mqtt = mqtt.Client("OTP")  # MQTT client 생성, 이름 ""
+                    mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
+                    mqtt.publish("otp_start", json.dumps({"data": "start"}))  # topic 과 넘겨줄 값
+
+
+                # 2..... OTP 인증 Mode start!! --- (MQTT) 답변 받기 및 메세지 분석
+                otp_result = self.otp_client.result_msg
+                if otp_result == "Success":
+                    print("인증 성공!")
+                    return True
+                elif otp_result == "Time_Over":
+                    print("시간초과!!")
+                    self.mongo.storeImg_otp(frame, 'intruder.jpg')  # 넘길 이미지와 이름
+                    return False  # 다시 드론으로부터 이미지 받아서 추적
+                if self.otp_client.limit == 5:
+                    # 2-1.... 인증시도 5회 만료시, 현장 사진 mongoDB 저장
+                    print("관리자 확인 요망!")
+                    self.mongo.storeImg_otp(frame, 'intruder.jpg')  # 넘길 이미지와 이름
+                    return False  # 다시 드론으로부터 이미지 받아서 추적
+
+                # .......... 디버깅용
+                # cv2.imshow("origin", frame)
+                # if cv2.waitKey(1) & 0xFF == ord('q'):
+                #    break
+        except:
+            pass
 
 
 if __name__ =='__main__':
-    mqtt_Subscriber = MQTT_Subscriber("otp_result")
     # 사람을 찾는 main 함수
-    check_person()
+    find_person = Find_person()
+    find_person.check_person()

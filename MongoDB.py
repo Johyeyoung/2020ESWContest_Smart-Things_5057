@@ -1,6 +1,6 @@
 # create connection and connect to the database
 from mongoengine import connect, Document, fields
-
+import cv2
 
 # create a user class
 class User_Map(Document):
@@ -26,13 +26,17 @@ class MongoDB:
         # '192.168.0.15'
         connect(db="Hobserver", host='localhost', port=27017)  # 데이터 베이스생성  -> 컬렉션
 
-    # 저장할 이미지를 매개변수로 넣으면 바로 저장
+    #  # img = cv2.이미지 객체를 매개변수로 넣으면 바로 저장
     def storeImg_map(self, img=None, filename=None):
+        cv2.imwrite('./container/{}.jpg'.format(filename), img)
+        img = open('./container/{}.jpg'.format(filename), 'rb')
         kobot_B = User_Map(username='kobot_B')  # User_Map 객체 생성 : 실시간 도출된 맵 반영
         kobot_B.profile_image.replace(img, filename=filename)
         kobot_B.save()
 
     def storeImg_otp(self, img=None, filename=None):
+        cv2.imwrite('./otpChecker/{}.jpg'.format(filename), img)
+        img = open('./otpChecker/{}.jpg'.format(filename), 'rb')
         kobot_B = User_OTP_P(username='kobot_B')  # User_OTP_P 객체 생성 : 침입자의 모습 저장
         kobot_B.profile_image.replace(img, filename=filename)
         kobot_B.save()
