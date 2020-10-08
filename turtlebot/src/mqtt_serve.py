@@ -5,7 +5,7 @@ import rospy
 import time
 import math
 from std_msgs.msg import String
-import test_otp
+import otp
 import time_over
 
 
@@ -34,7 +34,7 @@ class MQTT_serve:
         return self.otp_flag
 
     def otp_start(self): # OTP인증 시작
-        test_otp.MQTT_Subscriber()
+        otp.MQTT_Subscriber()
         self.otp_flag = ""  # OTP_flag 초기화
 
     def otp_lost(self): #객체 재확인 필요 요청

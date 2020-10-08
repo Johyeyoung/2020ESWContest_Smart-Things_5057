@@ -1,33 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand />
+    <select />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="ec68e3ad-361e-4c7d-8144-cf85a1f558b8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/Realize.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/10.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/11.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/12.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/13.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/14.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/15.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/16.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/17.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/2.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/3.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/5.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/6.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/7.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/8.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Embedded-Software-2020/container/9.jpg" beforeDir="false" />
+    <list default="true" id="ec68e3ad-361e-4c7d-8144-cf85a1f558b8" name="Default Changelist" comment="turtlebot move 완료">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/turtlebot/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/turtlebot/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/turtlebot/src/mqtt_serve.py" beforeDir="false" afterPath="$PROJECT_DIR$/turtlebot/src/mqtt_serve.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/turtlebot/src/test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/turtlebot/src/test_otp.py" beforeDir="false" afterPath="$PROJECT_DIR$/turtlebot/src/otp.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="FavoritesManager">
-    <favorites_list name="hobserver" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -37,25 +26,35 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/Embedded-Software-2020" />
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="sun3850 &lt;sun3850@naver.com&gt;" />
+      </list>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1eSYGT0iiqERyUfky71j6ka4561" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
-  <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$USER_HOME$/OneDrive/문서/카카오톡 받은 파일/Oss-KOBOT/code" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/turtlebot/src/demo" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/turtlebot/src/demo" />
+      <recent name="$PROJECT_DIR$/turtlebot_move/wjdgustjd" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/turtlebot/src" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/turtlebot_move/wjdgustjd/save_file" />
+      <recent name="$PROJECT_DIR$/turtlebot_move/wjdgustjd" />
+    </key>
   </component>
   <component name="RunManager" selected="Python.Find_path">
     <configuration name="20175168 (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -173,6 +172,7 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -184,19 +184,198 @@
       <option name="presentableId" value="Default" />
       <updated>1594316364735</updated>
     </task>
+    <task id="LOCAL-00001" summary="turtlebot move">
+      <created>1601907967511</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1601907967511</updated>
+    </task>
+    <task id="LOCAL-00002" summary="turtlebot move">
+      <created>1601937124341</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1601937124341</updated>
+    </task>
+    <task id="LOCAL-00003" summary="turtlebot move">
+      <created>1601961676915</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1601961676916</updated>
+    </task>
+    <task id="LOCAL-00004" summary="turtlebot move">
+      <created>1601961695908</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1601961695908</updated>
+    </task>
+    <task id="LOCAL-00005" summary="turtlebot move">
+      <created>1601962205633</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1601962205633</updated>
+    </task>
+    <task id="LOCAL-00006" summary="turtlebot move">
+      <created>1601966943025</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1601966943025</updated>
+    </task>
+    <task id="LOCAL-00007" summary="turtlebot move">
+      <created>1601971215712</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1601971215712</updated>
+    </task>
+    <task id="LOCAL-00008" summary="turtlebot move">
+      <created>1601971813970</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1601971813970</updated>
+    </task>
+    <task id="LOCAL-00009" summary="turtlebot move">
+      <created>1601972645267</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1601972645267</updated>
+    </task>
+    <task id="LOCAL-00010" summary="turtlebot move">
+      <created>1601973140865</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1601973140865</updated>
+    </task>
+    <task id="LOCAL-00011" summary="turtlebot move">
+      <created>1601973176105</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1601973176105</updated>
+    </task>
+    <task id="LOCAL-00012" summary="turtlebot move 완성">
+      <created>1601982958453</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1601982958453</updated>
+    </task>
+    <task id="LOCAL-00013" summary="turtlebot move 완료">
+      <created>1601984128493</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1601984128493</updated>
+    </task>
+    <task id="LOCAL-00014" summary="turtlebot move 완료">
+      <created>1601984936127</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1601984936127</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
-        <entry key="MAIN">
+        <entry key="1">
           <value>
             <State>
-              <option name="COLUMN_ORDER" />
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
             </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State />
           </value>
         </entry>
       </map>
     </option>
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="1" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="turtlebot move" />
+    <MESSAGE value="turtlebot move 완성" />
+    <MESSAGE value="turtlebot move 완료" />
+    <option name="LAST_COMMIT_MESSAGE" value="turtlebot move 완료" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="684" y="351" width="609" height="402" key="#Notifications" timestamp="1601907114223">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="684" y="351" width="609" height="402" key="#Notifications/67.27.1853.1053@67.27.1853.1053" timestamp="1601907114223" />
+    <state x="167" y="125" width="1653" height="855" key="DiffContextDialog" timestamp="1601907114565">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="167" y="125" width="1653" height="855" key="DiffContextDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1601907114565" />
+    <state width="1826" height="275" key="GridCell.Tab.0.bottom" timestamp="1601966694633">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1826" height="275" key="GridCell.Tab.0.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1601966694633" />
+    <state width="1826" height="275" key="GridCell.Tab.0.center" timestamp="1601966694630">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1826" height="275" key="GridCell.Tab.0.center/67.27.1853.1053@67.27.1853.1053" timestamp="1601966694630" />
+    <state width="1826" height="275" key="GridCell.Tab.0.left" timestamp="1601966694629">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1826" height="275" key="GridCell.Tab.0.left/67.27.1853.1053@67.27.1853.1053" timestamp="1601966694629" />
+    <state width="1826" height="275" key="GridCell.Tab.0.right" timestamp="1601966694632">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1826" height="275" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1601966694632" />
+    <state x="247" y="116" width="1482" height="872" key="MergeDialog" timestamp="1601905967994">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="247" y="116" width="1482" height="872" key="MergeDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1601905967994" />
+    <state x="482" y="188" key="SettingsEditor" timestamp="1601907036477">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="482" y="188" key="SettingsEditor/67.27.1853.1053@67.27.1853.1053" timestamp="1601907036477" />
+    <state x="588" y="287" width="800" height="531" key="Vcs.Push.Dialog.v2" timestamp="1601985147335">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="588" y="287" width="800" height="531" key="Vcs.Push.Dialog.v2/67.27.1853.1053@67.27.1853.1053" timestamp="1601985147335" />
+    <state x="656" y="272" width="672" height="678" key="search.everywhere.popup" timestamp="1601965182035">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="656" y="272" width="672" height="678" key="search.everywhere.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1601965182035" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/turtlebot/src/Lidar.py</url>
+          <line>2</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/turtlebot/src/save_file/move_jc.py</url>
+          <line>2</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/turtlebot/src/move.py</url>
+          <line>132</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

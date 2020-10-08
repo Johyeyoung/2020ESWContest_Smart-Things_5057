@@ -13,7 +13,7 @@ time.sleep(2)
 move = Turtlebot_move()
 while not rospy.is_shutdown():
     while move.mqtt_sub.get_recive_order() == "":  # 서버로부터 경로를 받을떄까지 기다림
-        print("waiting reived_order")
+        print("waiting recive_order")
 
     recive_order = move.mqtt_sub.get_recive_order()  # 경로를 임의로 설정
     order = recive_order.split("/")  # "/" 기준으로 명령을 분리
