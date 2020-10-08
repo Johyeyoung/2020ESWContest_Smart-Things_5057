@@ -15,11 +15,8 @@ class MQTT_serve:
         self.recive_order = ""  # 서버로부터의 경로
         self.otp_flag = "lost"
 
-        # rospy.init_node('turtle_server')
-        # self.sub_otp = \
         rospy.Subscriber('/otp_start', String, self.callback_otp)  # OTP Subscriber
-        # self.sub_server = \
-        rospy.Subscriber('/test', String, self.callback_server)  # 서버로부터 경로를 받는 Subscriber
+        rospy.Subscriber('/path_topic', String, self.callback_server)  # 서버로부터 경로를 받는 Subscriber
 
 
     # 서버로부터 터틀봇의 움직임을 받음
@@ -30,20 +27,18 @@ class MQTT_serve:
     def callback_otp(self, msg):
         self.otp_flag = msg.data  # OTP요청
 
-    def get_order(self):
+    def get_order(self): #경로 전달
         return self.recive_order
 
-    def get_otp_flag(self):
+    def get_otp_flag(self): #otp_flag 전달
         return self.otp_flag
 
-    def otp_start(self):
-        if self.otp_flag == "start":  # 서버로부터 start를 받았을 경우 otp실행
-            test_otp.MQTT_Subscriber()
-            self.otp_flag = ""  # OTP_flag 초기화
+    def otp_start(self): # OTP인증 시작
+        test_otp.MQTT_Subscriber()
+        self.otp_flag = ""  # OTP_flag 초기화
 
-    def otp_lost(self):
-        if self.otp_flag == "lost":  # 서버로부터 start를 받았을 경우 otp실행
-            test_otp.LOST_Subscriber()
-            self.otp_flag = ""  # OTP_flag 초기화
+    def otp_lost(self): #객체 재확인 필요 요청
+        time_over.LOST_Subscriber()
+        self.otp_flag = ""  # OTP_flag 초기화
 
 

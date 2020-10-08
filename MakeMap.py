@@ -18,7 +18,7 @@ class Realize:
         self.img_result = self.img.copy()
 
 
-    def contour(self):
+    def get_Max_contour(self):
 
         # 1st: 데모판 영역따기 - findcontour 처리해서 가장 큰 사각형 잡기  -> 기울어짐 제거 작업
         imgray = cv2.GaussianBlur(self.img, (5, 5), 0)
@@ -278,8 +278,9 @@ class Realize:
         return line_info
 
 if __name__ =='__main__':
-    realize = Realize()
-    realize.contour()
+    img = cv2.imread('./container/origin.jpg')
+    realize = Realize(img)
+    realize.get_Max_contour()
     realize.delete_destroy()
     realize.find_target_location()
     realize.draw_result_map()

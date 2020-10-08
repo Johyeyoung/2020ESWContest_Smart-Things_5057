@@ -8,7 +8,7 @@ class Find_path:
         # 1... map 생성자 객체 생성
         self.makeMap = Realize(img)
         # 2... map의 왜곡없애기
-        self.makeMap.contour()
+        self.makeMap.get_Max_contour()
         self.makeMap.delete_destroy()
         # 4... 침입자의 위치 알아내기
         self.target_x, self.target_y = math.ceil(location[0]/10), math.ceil(location[1] / 10)  # 밀입자의 좌표
@@ -36,8 +36,13 @@ class Find_path:
         dy = [0, 0, -1, 1]
         queue = [[start_x, start_y, [], []]]
         self.check_map[start_y][start_x] = 1
+<<<<<<< HEAD
         #print("destination", s[self.target_y - 1][self.target_x - 1])
         #print("destination2", s[start_y][start_x])
+=======
+        print("destination", s[self.target_y - 1][self.target_x - 1])
+        print("destination2", s[start_y][start_x])
+>>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
 
         while queue:
             x, y, path, direction = queue.pop(0)
@@ -70,7 +75,11 @@ class Find_path:
             arrows = self.arrows.split('/')
             result = [a[0]+str(len(a)*10) for a in arrows]
             pos = '/'.join(result)
+<<<<<<< HEAD
             print("!!!경로가 주어졌습니다!!! :", pos)
+=======
+            print(pos)
+>>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
 
             # 1.... 구해진 맵위에 turtlebot 이 움직일 경로 그려주기
             pos_lst = pos.split('/')
@@ -96,7 +105,7 @@ class Find_path:
 if __name__ =='__main__':
     img = cv2.imread('./container/origin.jpg')
     makeMap = Realize(img)
-    makeMap.contour()
+    makeMap.get_Max_contour()
     makeMap.delete_destroy()
     map = makeMap.draw_result_map()
     realize = Find_path(img, [80, 90], map)  # 인덱스 1부터 0부터 세지 말기

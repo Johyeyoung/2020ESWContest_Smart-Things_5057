@@ -26,13 +26,20 @@ def recvall(sock, count):
 # .......... 0-2. mongoDB 객체 생성
 mongo = MongoDB()
 
+<<<<<<< HEAD
 
 # .......... 1. TCP 소켓 열고 수신 대기
+=======
+>>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
 # .......... 0-1. 서버의 IP와 port 번호
 # .......... 4-2. TurtleBot 에게 MQTT 로 경로 정보 넘기기
 mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
 mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
 
+<<<<<<< HEAD
+=======
+# .......... 1. TCP 소켓 열고 수신 대기
+>>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
 TCP_IP = '192.168.0.15'
 TCP_PORT = int(sys.argv[1])
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -46,9 +53,15 @@ conn, addr = s.accept()
 postLocation = [0, 0]
 map_flag = True # 전체 구역과 관련해 미리 맵을 만든다
 map = None
+<<<<<<< HEAD
 
 
 
+=======
+
+
+
+>>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
 while True:
     # .......... 2. Client 접속 성공 & data 받기
     length = recvall(conn, 16)
@@ -91,8 +104,11 @@ while True:
         find_path.path_algorithm(postLocation)
         postLocation = location
         img, pos = find_path.real_path()
+<<<<<<< HEAD
         time.sleep(3)
 
+=======
+>>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
         mqtt.publish("pathList", json.dumps({"data": pos}))  # topic 과 넘겨줄 값
 
 
@@ -117,4 +133,7 @@ while True:
         # 다시 추적을 위해 드론소켓으로 작동하라는 명령을 내린다
         conn.send('DRONE_again'.encode('utf-8'))
         print('DRone_again')
+<<<<<<< HEAD
         time.sleep(3)
+=======
+>>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54

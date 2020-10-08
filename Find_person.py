@@ -163,4 +163,8 @@ def check_person():
 if __name__ =='__main__':
     mqtt_Subscriber = MQTT_Subscriber("otp_result")
     # 사람을 찾는 main 함수
+<<<<<<< HEAD
     check_person()
+=======
+    check_person()
+>>>>>>> f13faefe62aa05f3f3b9f6552c16dbc66d79aa54
