@@ -8,6 +8,7 @@ from move import Turtlebot_move
 if __name__ == '__main__':
 
     order = ""
+    save_order= ""
 
     time.sleep(2)
     move = Turtlebot_move()
@@ -17,13 +18,14 @@ if __name__ == '__main__':
 
         recieve_order = move.mqtt.get_recieve_order()  # 경로를 임의로 설정
         order = recieve_order.split("/")  # "/" 기준으로 명령을 분리
+        save_order  = save_order + order #지금까지의 경로를 저장 
         move.start(order)  # 터틀봇 이동 시작
 
         # 경로 이동후 OTP확인
         if (move.mqtt.get_otp_flag() == "start"):  # 목표물을 발견했을 경우 OTP인증 요구
             move.mqtt.otp_start()  # 인증 요구후 실패 성공 상관 없이 원래 경로로 복귀
-            order = order + ["G0"]
-            order = move.order_reversed(order)  # 경로를 역순으로 정렬
+            save_order = save_order + ["G0"]
+            order = move.order_reversed(save_order)  # 경로를 역순으로 정렬
             move.start(order)  # 역순으로 정렬된 경로로 이동
             break
 
