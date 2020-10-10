@@ -116,7 +116,7 @@ while True:
 
     find_person = Find_person()
     result = find_person.check_person()
-    if result == True:
+    if result == "Success" or result == "Real_Fail":
         conn.send('DRONE_close'.encode('utf-8'))
         print("\n\n\n_________________________________________________________________________")
         print('                 DRONE 감시 모드를 종료합니다.')
