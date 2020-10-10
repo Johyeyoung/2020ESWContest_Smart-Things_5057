@@ -148,16 +148,16 @@ class Find_person:
                 otp_result = self.otp_client.result_msg
                 if otp_result == "Success":
                     print("▶ OTP 인증 성공 ")
-                    return True
+                    return "Success"
                 elif otp_result == "Time_Over":
                     print("▶ OTP 시간 초과 ")
                     self.mongo.storeImg_otp(frame, 'intruder.jpg')  # 넘길 이미지와 이름
-                    return False  # 다시 드론으로부터 이미지 받아서 추적
+                    return "Time_Over"  # 다시 드론으로부터 이미지 받아서 추적
                 if self.otp_client.limit == 5:
                     # 2-1.... 인증시도 5회 만료시, 현장 사진 mongoDB 저장
                     print("▶ OTP 관리자 확인 요망 ")
                     self.mongo.storeImg_otp(frame, 'intruder.jpg')  # 넘길 이미지와 이름
-                    return False  # 다시 드론으로부터 이미지 받아서 추적
+                    return "Real_Fail"  # 다시 드론으로부터 이미지 받아서 추적
 
                 # .......... 디버깅용
                 # cv2.imshow("origin", frame)
