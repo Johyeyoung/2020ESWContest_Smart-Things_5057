@@ -18,7 +18,7 @@
 
  ![image](https://user-images.githubusercontent.com/24893215/95682473-5fc27b80-0c20-11eb-8b05-326d5c64cded.png)
 
-### HW
+### 1. HW
 
 HW 구성
 
@@ -50,7 +50,7 @@ HW 구성
  자율주행 감시 로봇에 부착되어 있으며 서버로부터 OTP인증 요청 신호를 받으면OTP인증을 실행한다. 
 
 
-### SW
+### 2. SW
 
 SW 구성 
 
