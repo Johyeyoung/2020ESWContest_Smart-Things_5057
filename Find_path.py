@@ -14,18 +14,24 @@ class Find_path:
         self.target_x, self.target_y = math.ceil(location[0]/10), math.ceil(location[1] / 10)
         # 3... 맵 만들기
         self.map = map
-
+        
         # check 맵 초기화
         self.check_map = [[0 for i in range(len(self.map[0]))] for row in range(len(self.map[0]))]
         self.arrows = ''
 
-
+        
+        # 터틀봇의 이동된 위치를 담음 
+        self.post_x =0;
+        self.post_y =0;
 
     # 최적의 경로를 찾는다
     def path_algorithm(self, postLocation):
         # ........ Turtlebot 의 시작 위치
         start_x, start_y = math.ceil(postLocation[0]/10), math.ceil(postLocation[1]/10)
-
+        self.post_x = start_x
+        self.post_y = start_y
+        
+        
         # ....... 위치 데이터 : index = 1(목적지), index = 0(시작점)  : print문은 => index 1부터
         print("   ---------------------------------------------------------------------------")
         print("              침입자의 위치: (x, y) = ({}, {}) | 좌표값 = {}".format(self.target_x, self.target_y, self.map[self.target_y - 1][self.target_x - 1]))
@@ -81,7 +87,7 @@ class Find_path:
 
             # 2.... 구해진 맵위에 turtlebot 이 움직일 경로 그려주기
             pos_lst = self.arrows.split('/')
-            x, y = 0, 0
+            x, y = self.post_x, self.post_y
             for i in pos_lst:
                 post_x, post_y = x, y
                 if i[0] == "G":
