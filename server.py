@@ -121,9 +121,9 @@ while True:
 
     
     ########### 잠시만 stop ############
-    #find_person = Find_person()
-    #result = find_person.check_person()
-    result = "again"
+    find_person = Find_person()
+    result = find_person.check_person()
+    # result = "again"
     if result == "Success" or result == "Real_Fail":
         conn.send('DRONE_close'.encode('utf-8'))
         print("\n\n\n_________________________________________________________________________")
