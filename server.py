@@ -119,8 +119,11 @@ while True:
     print("_________________________  터틀봇이 주행을 시작합니다. _________________________")
     print("                                       ▼\n\n")
 
-    find_person = Find_person()
-    result = find_person.check_person()
+    
+    ########### 잠시만 stop ############
+    #find_person = Find_person()
+    #result = find_person.check_person()
+    result = "again"
     if result == "Success" or result == "Real_Fail":
         conn.send('DRONE_close'.encode('utf-8'))
         print("\n\n\n_________________________________________________________________________")
