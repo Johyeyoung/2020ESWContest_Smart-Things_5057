@@ -89,6 +89,7 @@ while True:
     #print("                                     ▼")
     #print("                                     ▼\n\n")
     time.sleep(2)
+    result_flag = 0  # 경로맵이 저장되는지 여부
     if location[0]//10 != postLocation[0]//10 and location[1]//10 != postLocation[1]//10:
         find_path = Find_path(decimg, location, map)
         find_path.path_algorithm(postLocation)
