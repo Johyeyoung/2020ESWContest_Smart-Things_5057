@@ -16,6 +16,12 @@ $(document).ready(function(){
         $('.map_result').html('<div class="blinking">객체를 추적하는 중입니다</div><br>'+
         '<img src=' + data + img_size);
     });
+    // 경로 갱신 시
+    socket.on("map_result2_evt",function(data){
+        $('state_check1').remove(); // 안되면 position 으로 덮어씌우기
+        $('.map_result2').html('<div class="blinking">객체를  </div><br>'+
+        '<img src=' + data + img_size);
+    });
     console.log('intruder_evt received');
     socket.on("intruder_evt",function(data){
         $('.intruder').html('<div class="blinking">침입자 이미지입니다</div><br>'+ 
@@ -49,6 +55,9 @@ function timer1(){
     console.log("___________________")
     socket.emit("map_result_evt", JSON.stringify({}));
     console.log("map_result")
+    console.log("___________________")
+    socket.emit("map_result2_evt", JSON.stringify({}));
+    console.log("map_result2")
     console.log("___________________")
     socket.emit("otp_state_evt", JSON.stringify({}));
     console.log("otp_state")
