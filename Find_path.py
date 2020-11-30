@@ -87,9 +87,12 @@ class Find_path:
 
             # 2.... 구해진 맵위에 turtlebot 이 움직일 경로 그려주기
             pos_lst = self.arrows.split('/')
-            x, y = self.post_x, self.post_y
+            x, y = 0, 0
+            post_x = self.post_x
+            post_y = self.post_y
+            
             for i in pos_lst:
-                post_x, post_y = x, y
+                x, y = 0, 0
                 if i[0] == "G":
                     y += int(i[1:])
                 elif i[0] == "B":
@@ -98,7 +101,10 @@ class Find_path:
                     x += int(i[1:])
                 elif i[0] == "R":
                     x -= int(i[1:])
-                cv2.line(img, (post_x, post_y), (x, y), (255, 0, 255), 2)
+                # 과거 정보 저장하기 
+                cv2.line(img, (post_x, post_y), (post_x + x, post_y + y), (255, 0, 255), 2)
+                post_x += x
+                post_y += y
             return img, self.arrows
 
         else:
