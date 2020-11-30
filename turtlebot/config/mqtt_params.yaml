@@ -2,7 +2,7 @@ mqtt:
   client:
     protocol: 4      # MQTTv311
   connection:
-    host: 192.168.0.15 # minjeongs mqtt server
+    host: 192.168.0.43 # minjeongs mqtt server
     port: 1883
     keepalive: 60
   private_path: device/001
