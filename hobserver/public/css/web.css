@@ -46,6 +46,13 @@ div.bottom-left{
   width: 400px;
   height:380px;
 }
+div.bottom-overlap{
+  position:absolute;
+  left:0px;
+  width:400px;
+  height:380px;
+
+}
 div.bottom-right{
   /* outline: 1px solid #9F9F9F; */
   position: absolute;
