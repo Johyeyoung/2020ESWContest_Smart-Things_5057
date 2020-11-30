@@ -110,7 +110,7 @@ fps = FPS().start()
 
 
 # ....... 1st : 서버와 연결 및 필요한 객체들 생성
-TCP_IP = '192.168.0.15'
+TCP_IP = '192.168.0.43'
 TCP_PORT = int(sys.argv[1])
 drone_client = DRONE_Client(TCP_IP, TCP_PORT)
 
