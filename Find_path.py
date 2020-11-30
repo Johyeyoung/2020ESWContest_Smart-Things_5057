@@ -12,31 +12,29 @@ class Find_path:
         self.makeMap.delete_destroy()
         # 4... 침입자의 위치 알아내기 (1/10배로 줄임)
         self.target_x, self.target_y = math.ceil(location[0]/10), math.ceil(location[1] / 10)
+
+        # 4-1 ..... 터틀봇의 시작 위치
+        self.postLocation = None
         # 3... 맵 만들기
         self.map = map
-        
+
         # check 맵 초기화
         self.check_map = [[0 for i in range(len(self.map[0]))] for row in range(len(self.map[0]))]
         self.arrows = ''
 
-        
-        # 터틀봇의 이동된 위치를 담음 
-        self.post_x =0;
-        self.post_y =0;
+
 
     # 최적의 경로를 찾는다
     def path_algorithm(self, postLocation):
         # ........ Turtlebot 의 시작 위치
+        self.postLocation = postLocation
         start_x, start_y = math.ceil(postLocation[0]/10), math.ceil(postLocation[1]/10)
-        self.post_x = start_x
-        self.post_y = start_y
-        
-        
+
         # ....... 위치 데이터 : index = 1(목적지), index = 0(시작점)  : print문은 => index 1부터
-        print("   ---------------------------------------------------------------------------")
-        print("              침입자의 위치: (x, y) = ({}, {}) | 좌표값 = {}".format(self.target_x, self.target_y, self.map[self.target_y - 1][self.target_x - 1]))
-        print("              터틀봇의 위치: (x, y) = ({}, {}) | 좌표값 = {}".format(start_x+1, start_y+1, self.map[start_y][start_x])) #
-        print("   ---------------------------------------------------------------------------")
+        print("---------------------------------------------------------------")
+        print("          침입자의 위치: (x, y) = ({}, {}) | 좌표값 = {}".format(self.target_x, self.target_y, self.map[self.target_y - 1][self.target_x - 1]))
+        print("          터틀봇의 위치: (x, y) = ({}, {}) | 좌표값 = {}".format(start_x+1, start_y+1, self.map[start_y][start_x])) #
+        print("---------------------------------------------------------------")
 
         # ....... 경로 algorithm 시작
         dot_name = {(0, 1): "L",  (1, 0): "G", (0, -1): "R", (-1, 0): "B"}  # (y, x)
@@ -50,7 +48,7 @@ class Find_path:
 
             if x == self.target_x - 1 and y == self.target_y - 1:
                 # 최종 경로 도착
-                print("              원본 경로: ", "".join(direction))  # LLLRRRGGG
+                print("          원본 경로: ", "".join(direction))  # LLLRRRGGG
                 self.arrows = "".join(direction)
                 self.arrows = self.path_MQTT(self.arrows)  # 주어진 형식대로 MQTT 메세지 데이터 정리
                 break
@@ -73,8 +71,8 @@ class Find_path:
             # LLLLRRRRR -> L40R50
             result = [a[0]+str(len(a)*10) for a in pathData.split('/')]
             pathData = '/'.join(result)
-            print("              최종 경로: ", pathData)
-            print("   ---------------------------------------------------------------------------")
+            print("          최종 경로: ", pathData)
+            print("-------------------------------------------------------------------")
 
             return pathData
 
@@ -87,12 +85,10 @@ class Find_path:
 
             # 2.... 구해진 맵위에 turtlebot 이 움직일 경로 그려주기
             pos_lst = self.arrows.split('/')
-            x, y = 0, 0
-            post_x = self.post_x
-            post_y = self.post_y
-            
+            x, y = self.postLocation[0], self.postLocation[1]
+
             for i in pos_lst:
-                x, y = 0, 0
+                post_x, post_y = x, y
                 if i[0] == "G":
                     y += int(i[1:])
                 elif i[0] == "B":
@@ -101,10 +97,12 @@ class Find_path:
                     x += int(i[1:])
                 elif i[0] == "R":
                     x -= int(i[1:])
-                # 과거 정보 저장하기 
-                cv2.line(img, (post_x, post_y), (post_x + x, post_y + y), (255, 0, 255), 2)
-                post_x += x
-                post_y += y
+                cv2.line(img, (post_x, post_y), (x, y), (255, 0, 255), 2)
+
+            cv2.namedWindow('map', cv2.WINDOW_GUI_NORMAL)
+            cv2.imshow("map", cv2.resize(img, (250, 250)))
+            #cv2.setWindowProperty('map', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+            cv2.waitKey(0)
             return img, self.arrows
 
         else:
@@ -118,6 +116,6 @@ if __name__ =='__main__':
     makeMap.get_Max_contour()
     makeMap.delete_destroy()
     map = makeMap.draw_result_map()
-    realize = Find_path(img, [80, 90], map)  # 인덱스 1부터 0부터 세지 말기
-    realize.path_algorithm([140, 140])  # 시작점 인덱스 0부터
+    realize = Find_path(img, [30, 110], map)  # 인덱스 1부터 0부터 세지 말기
+    realize.path_algorithm([80, 90])  # 시작점 인덱스 0부터
     img, path = realize.drawing_path()
