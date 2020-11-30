@@ -34,7 +34,7 @@ mqtt = mqtt.Client("loadFinder")  # MQTT client 생성, 이름 ""
 mqtt.connect("localhost", 1883)  # 로컬호스트에 있는 MQTT서버에 접속
 
 # .......... 1. TCP 소켓 열고 수신 대기
-TCP_IP = '192.168.0.15'
+TCP_IP = '192.168.0.43'
 TCP_PORT = int(sys.argv[1])
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((TCP_IP, TCP_PORT))
@@ -98,9 +98,13 @@ while True:
 
 
         # .......... 4-1. 경로 맵(map_result.jpg)을 mongoDB에 저장하기
-        mongo.storeImg_map(img, 'map_result.jpg')
-        print("\n\n                            map_result image saved!! ")
-
+        if result_flag == 0:
+            mongo.storeImg_map(img, 'map_result.jpg')
+            print("\n\n                            map_result image saved!! ")
+            result_flag = 1
+        else:
+            mongo.storeImg_map(img, 'map_result2.jpg')
+            print("\n\n                            map_result2 image saved!! ")
 
     else:
         print("\n\n\n___________________________________________________________________________")
