@@ -1,0 +1,33 @@
+mqtt:
+  client:
+    protocol: 4      # MQTTv311
+  connection:
+    host: 192.168.0.43 # minjeongs mqtt server
+    port: 1883
+    keepalive: 60
+  private_path: device/001
+serializer: json:dumps
+deserializer: json:loads
+bridge:
+  # testing turtlebot_path
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: std_msgs.msg:String
+    topic_from: /ros_to_mqttbridge
+    topic_to: test_topic
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: std_msgs.msg:String
+    topic_from: test_topic
+    topic_to: /mqttbridge_to_ros
+
+
+  # mqtt to turtlebot otp
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: std_msgs.msg:String
+    topic_from: pathList
+    topic_to: /path_topic
+
+  # mqtt to turtlebot otp
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: std_msgs.msg:String
+    topic_from: otp_start
+    topic_to: /otp_start
