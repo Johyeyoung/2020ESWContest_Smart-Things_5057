@@ -24,7 +24,7 @@ class User_OTP_P(Document):
 class MongoDB:
     def __init__(self):
         # '192.168.0.15'
-        connect(db="Hobserver", host='localhost', port=27017)  # 데이터 베이스생성  -> 컬렉션
+        connect(db="Hobserver", host='192.168.0.43', port=27017)  # 데이터 베이스생성  -> 컬렉션
 
     #  # img = cv2.이미지 객체를 매개변수로 넣으면 바로 저장
     def storeImg_map(self, img=None, filename=None):
